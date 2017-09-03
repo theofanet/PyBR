@@ -73,6 +73,8 @@ class App(object):
                 if event.type == QUIT or Keyboard.is_down(K_ESCAPE):
                     App.exit()
 
+            pygame.time.wait(0)
+
             App._window.fill(App._backgroundColor)
 
             # Updating and drawing active scene
