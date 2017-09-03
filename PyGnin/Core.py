@@ -21,7 +21,7 @@ class App(object):
         App._screenSize = size
         App._backgroundColor = background
         pygame.init()
-        App._window = pygame.display.set_mode(App._screenSize)
+        App._window = pygame.display.set_mode(App._screenSize, pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.FULLSCREEN)
         App._title = title
         pygame.display.set_caption(App._title)
         if not mouse_visible:
