@@ -1,4 +1,6 @@
 from pygame.locals import *
+import pygame
+
 
 M_LEFT = 1
 M_MIDDLE = 2
@@ -62,6 +64,10 @@ class Mouse(object):
     @staticmethod
     def position():
         return Mouse._position
+
+    @staticmethod
+    def set_position(position=(0, 0)):
+        pygame.mouse.set_pos(position[0], position[1])
 
     @staticmethod
     def rel():

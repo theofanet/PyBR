@@ -15,17 +15,19 @@ class SpriteGroup(pygame.sprite.Group):
 
 
 class Scene(object):
-    _images = {}
-    _keyboardRepeat = None
-    _sprites = None
 
     def __init__(self):
         super().__init__()
+        self._camera = None
         self._images = {}
         self._sprites = SpriteGroup()
+        self._keyboardRepeat = None
 
     def update(self):
         self._sprites.update()
+
+    def get_camera(self):
+        return self._camera
 
     def draw(self):
         self.draw_sprites()

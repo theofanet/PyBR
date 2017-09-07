@@ -1,15 +1,20 @@
 from PyGnin import *
-
 import Scenes
+from configparser import ConfigParser
 
+
+config = ConfigParser()
+config.read("./config.ini")
+Registry.register("config", config)
 
 if __name__ == '__main__':
     App.init(
-        size=(840, 480),
-        background=(255, 255, 255),
-        mouse_visible=True,
-        show_fps=True,
-        fps=60
+        size=list(map(int, config.get("window", "size").split(","))),
+        background=list(map(int, config.get("window", "background").split(","))),
+        mouse_visible=config.getboolean("window", "mouse_visible"),
+        show_fps=config.getboolean("window", "show_fps"),
+        fps=config.getint("window", "fps"),
+        fullscreen=config.getboolean("window", "fullscreen")
     )
 
     # Loading scenes

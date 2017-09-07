@@ -8,6 +8,7 @@ from .Core import App
 
 from pygame.locals import *
 
+DIR_NONE = 0
 DIR_LEFT = 1
 DIR_RIGHT = 2
 DIR_UP = 3

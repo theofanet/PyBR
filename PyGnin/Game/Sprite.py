@@ -3,14 +3,14 @@ from ..Render.Image import Image
 
 
 class Sprite(pygame.sprite.Sprite):
-    rect = None
-    area = None
-    image = None
-    _scale = 1
-    _image = None
-
     def __init__(self):
         super().__init__()
+        self.rect = None
+        self.area = None
+        self.image = None
+        self._scale = 1
+        self._image = None
+        self.draw_size = None
 
     def load_image(self, path):
         self._image = Image(path)
@@ -37,6 +37,13 @@ class Sprite(pygame.sprite.Sprite):
 
     def set_scale(self, scale):
         self._scale = scale
+        n_surf = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA, 32)
+        n_surf = n_surf.convert_alpha(n_surf)
+        n_surf.blit(self.image, pygame.Rect(0, 0, self.rect.width, self.rect.height))
+        size = n_surf.get_size()
+        n_surf = pygame.transform.scale(n_surf, (size[0] * self._scale, size[1] * self._scale))
+        self.image = n_surf
+        self.rect = self.image.get_rect()
 
     def draw(self, surface, camera=None):
         if self.image:
@@ -49,10 +56,4 @@ class Sprite(pygame.sprite.Sprite):
                 if not camera.is_in(self.rect):
                     return None
 
-            n_surf = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA, 32)
-            n_surf = n_surf.convert_alpha(n_surf)
-            n_surf.blit(self.image, pygame.Rect(0, 0, rect.width, rect.height), self.area)
-            size = n_surf.get_size()
-            n_surf = pygame.transform.scale(n_surf, (size[0] * self._scale, size[1] * self._scale))
-
-            return surface.blit(n_surf, rect)
+            return surface.blit(self.image, rect, self.area)

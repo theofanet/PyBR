@@ -48,6 +48,10 @@ class AnimatedSprite(Sprite):
         super().load_image(path)
         self._frameRect = self.rect
 
+    def set_scale(self, scale):
+        super().set_scale(scale)
+        self._frameRect = self.rect
+
     def draw(self, surface, camera=None):
         if self._animation:
             self.set_area(

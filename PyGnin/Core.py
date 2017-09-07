@@ -33,7 +33,7 @@ class App(object):
         App._clock = pygame.time.Clock()
         App._FPS = fps
         App._showFps = show_fps
-        App._font = pygame.font.SysFont("monospace", 15)
+        Debug.init(font_size=16)
         atexit.register(App.exit)
 
     @staticmethod
@@ -49,6 +49,11 @@ class App(object):
         if scene in App._scenes:
             App._activeScene = scene
             App._scenes[App._activeScene].activate()
+
+    @staticmethod
+    def get_active_scene():
+        if App._activeScene:
+            return App._scenes[App._activeScene]
 
     @staticmethod
     def load_scene(key, scene):
@@ -87,11 +92,10 @@ class App(object):
                 App._scenes[App._activeScene].update()
                 App._scenes[App._activeScene].draw()
 
+            Debug.draw(App._window)
             pygame.display.update()
-
-            label = App._font.render("Some text!", 1, (255, 255, 0))
-            App._window.blit(label, (100, 100))
 
             App._clock.tick(App._FPS)
             if App._showFps:
-                App.set_title("{0} - {1} FPS".format(App._title, round(App._clock.get_fps(), 2)))
+                Debug.log("FPS : {0:.2f}", App._clock.get_fps())
+                # App.set_title("{0} - {1} FPS".format(App._title, round(App._clock.get_fps(), 2)))
