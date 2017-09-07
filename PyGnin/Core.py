@@ -15,13 +15,17 @@ class App(object):
     _clock = None
     _showFps = False
     _title = ""
+    _font = None
 
     @staticmethod
-    def init(size=(0, 0), background=(0, 0, 0), mouse_visible=True, title="Gnin App", fps=60, show_fps=False):
+    def init(size=(0, 0), background=(0, 0, 0), mouse_visible=True, title="Gnin App", fps=60, show_fps=False, fullscreen=False):
         App._screenSize = size
         App._backgroundColor = background
         pygame.init()
-        App._window = pygame.display.set_mode(App._screenSize, pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.FULLSCREEN)
+        flags = pygame.DOUBLEBUF | pygame.HWSURFACE
+        if fullscreen:
+            flags = flags | pygame.FULLSCREEN
+        App._window = pygame.display.set_mode(App._screenSize, flags)
         App._title = title
         pygame.display.set_caption(App._title)
         if not mouse_visible:
@@ -29,6 +33,7 @@ class App(object):
         App._clock = pygame.time.Clock()
         App._FPS = fps
         App._showFps = show_fps
+        App._font = pygame.font.SysFont("monospace", 15)
         atexit.register(App.exit)
 
     @staticmethod
@@ -83,6 +88,10 @@ class App(object):
                 App._scenes[App._activeScene].draw()
 
             pygame.display.update()
+
+            label = App._font.render("Some text!", 1, (255, 255, 0))
+            App._window.blit(label, (100, 100))
+
             App._clock.tick(App._FPS)
             if App._showFps:
                 App.set_title("{0} - {1} FPS".format(App._title, round(App._clock.get_fps(), 2)))
