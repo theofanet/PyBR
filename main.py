@@ -7,6 +7,7 @@ config = ConfigParser()
 config.read("./config.ini")
 Registry.register("config", config)
 
+
 if __name__ == '__main__':
     App.init(
         size=list(map(int, config.get("window", "size").split(","))),
@@ -19,6 +20,8 @@ if __name__ == '__main__':
 
     # Loading scenes
     App.load_scene("main", Scenes.FirstScene())
+    App.load_scene("menu", Scenes.Menu())
+    App.load_scene("settings", Scenes.Settings())
     App.set_active_scene("main")
 
     App.run()

@@ -1,6 +1,7 @@
 import PyGnin
 from PyGnin import *
 import pygame
+from .Bullet import Bullet
 
 
 class Player(Game.AnimatedSprite):
@@ -22,12 +23,20 @@ class Player(Game.AnimatedSprite):
         self._aimPosition = [0, 0]
         self._aims = Render.TileSet("assets/aims.png", (188, 200))
         self._aims.set_scale(self._config.getfloat("aim", "scale"))
-        self._aims.set_color(list(map(int, self._config.get("aim", "color").split(","))))
+        self._aim_color = None
+        self.set_aim_color(list(map(int, self._config.get("aim", "color").split(","))))
+        self._bullets = []
+
+    def set_aim_color(self, col):
+        self._aims.set_color(col)
+        self._aim_color = col
 
     def update(self, *args):
         x, y = self.get_position()
-        x_mouse, y_mouse = IO.Mouse.position()
-        x_cam, y_cam = App.get_active_scene().get_camera().get_position()
+        if App.get_active_scene().get_camera():
+            x_cam, y_cam = App.get_active_scene().get_camera().get_position()
+        else:
+            x_cam, y_cam = (0, 0)
 
         if IO.Keyboard.is_held(K_LEFT):
             if self._direction != PyGnin.DIR_UP and self._direction != PyGnin.DIR_DOWN:
@@ -87,6 +96,12 @@ class Player(Game.AnimatedSprite):
             self.set_animation("run-left")
         IO.Mouse.set_position(self._aimPosition)
 
+        for bullet in self._bullets:
+            bullet.update(*args)
+
+        if IO.Mouse.is_down(IO.M_LEFT):
+            self.shoot()
+
         super().update(*args)
 
     def draw(self, surface, camera=None):
@@ -98,12 +113,20 @@ class Player(Game.AnimatedSprite):
         if self._config.getboolean("aim", "draw_line"):
             pygame.draw.line(
                 surface,
-                (255, 0, 0),
+                self._aim_color,
                 (x + self._frameRect.width / 2 - x_cam, y + self._frameRect.height / 2 - y_cam),
                 aim_pos
             )
         c, r = list(map(int, self._config.get("aim", "type").split(",")))
         self._aims.draw_tile(c, r, aim_pos[0], aim_pos[1], True)
+
+        i = 0
+        for bullet in self._bullets:
+            bullet.draw(surface, camera)
+            if bullet.is_destroy():
+                del self._bullets[i]
+            i += 1
+
         super().draw(surface, camera)
 
     def set_play_size(self, size=(0, 0)):
@@ -114,3 +137,18 @@ class Player(Game.AnimatedSprite):
 
     def get_speed(self):
         return self._speed
+
+    def shoot(self):
+        x, y = self.get_position()
+        x, y = (x + self._frameRect.width / 2, y + self._frameRect.height / 2)
+        aim_x, aim_y = self._aimPosition
+        aim_x, aim_y = (aim_x + self._aims.get_tile_size()[0] / 2, aim_y + self._aims.get_tile_size()[1] / 2)
+        if App.get_active_scene().get_camera():
+            x_cam, y_cam = App.get_active_scene().get_camera().get_position()
+        else:
+            x_cam, y_cam = (0, 0)
+        bullet = Bullet(
+            (x, y),
+            (aim_x + x_cam - x, aim_y + y_cam - y)
+        )
+        self._bullets.append(bullet)

@@ -19,6 +19,12 @@ class TileSet(object):
     def set_color(self, color=(255, 255, 255)):
         return self.set_color_rgb(color[0], color[1], color[2])
 
+    def get_color(self):
+        return self._image.get_color()
+
+    def get_tile_size(self):
+        return self._tileSize
+
     def draw_tile(self, col, row, x, y, at_center=False, screen=None):
         if not screen:
             screen = App.get_display()

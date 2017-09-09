@@ -3,6 +3,8 @@ import sys
 import atexit
 
 from .IO import *
+import PyGnin.Gui as Gui
+from PyGnin.Gui.locals import *
 
 
 class App(object):
@@ -16,6 +18,8 @@ class App(object):
     _showFps = False
     _title = ""
     _font = None
+    _time = 0
+    _gui_screen = None
 
     @staticmethod
     def init(size=(0, 0), background=(0, 0, 0), mouse_visible=True, title="Gnin App", fps=60, show_fps=False, fullscreen=False):
@@ -34,6 +38,7 @@ class App(object):
         App._FPS = fps
         App._showFps = show_fps
         Debug.init(font_size=16)
+        App._gui_screen = Gui.surface.Screen(size, flags, display=App._window)
         atexit.register(App.exit)
 
     @staticmethod
@@ -45,7 +50,13 @@ class App(object):
         return App._screenSize
 
     @staticmethod
+    def show_cursor(visible):
+        pygame.mouse.set_visible(visible)
+
+    @staticmethod
     def set_active_scene(scene):
+        if App._activeScene:
+            App._scenes[App._activeScene].close_scene()
         if scene in App._scenes:
             App._activeScene = scene
             App._scenes[App._activeScene].activate()
@@ -75,12 +86,21 @@ class App(object):
         return App._clock
 
     @staticmethod
+    def get_time():
+        return App._time
+
+    @staticmethod
+    def show_fps(show=True):
+        App._showFps = show
+
+    @staticmethod
     def run():
         while True:
             for event in pygame.event.get():
+                Gui.event(event)
                 Keyboard.update(event)
                 Mouse.update(event)
-                if event.type == QUIT or Keyboard.is_down(K_ESCAPE):
+                if event.type == QUIT:
                     App.exit()
 
             pygame.time.wait(0)
@@ -93,9 +113,10 @@ class App(object):
                 App._scenes[App._activeScene].draw()
 
             Debug.draw(App._window)
+
             pygame.display.update()
 
-            App._clock.tick(App._FPS)
+            App._time = App._clock.tick(App._FPS)
             if App._showFps:
                 Debug.log("FPS : {0:.2f}", App._clock.get_fps())
                 # App.set_title("{0} - {1} FPS".format(App._title, round(App._clock.get_fps(), 2)))

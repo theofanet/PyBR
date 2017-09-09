@@ -21,7 +21,7 @@ class Scene(object):
         self._camera = None
         self._images = {}
         self._sprites = SpriteGroup()
-        self._keyboardRepeat = None
+        self._keyboardRepeat = (400, 30)
 
     def update(self):
         self._sprites.update()
@@ -52,6 +52,8 @@ class Scene(object):
         self._load_resources()
         if self._keyboardRepeat:
             pygame.key.set_repeat(self._keyboardRepeat[0], self._keyboardRepeat[1])
+
+    def close_scene(self): pass
 
     def _load_resources(self): pass
 

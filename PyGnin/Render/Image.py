@@ -9,6 +9,7 @@ class Image(object):
         self._path = ""
         self._scale = 1
         self._img = pygame.image.load(path)
+        self._color = (255, 255, 255)
         if convert:
             self._img.convert()
 
@@ -22,8 +23,12 @@ class Image(object):
         img = self._img.copy()
         img.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
         img.fill((r, g, b, 0), None, pygame.BLEND_RGBA_ADD)
+        self._color = (r, g, b)
         self._img = img
         return self
+
+    def get_color(self):
+        return self._color
 
     def set_scale(self, scale):
         self._scale = scale

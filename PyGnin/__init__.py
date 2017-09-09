@@ -4,6 +4,8 @@ import PyGnin.Game as Game
 import PyGnin.IO as IO
 import PyGnin.Render as Render
 
+import PyGnin.Gui as Gui
+
 from .Core import App
 
 from pygame.locals import *

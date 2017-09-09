@@ -18,7 +18,7 @@ class Vector(object):
         self.y *= mult
 
     def magnitude(self):
-        return math.sqrt(self.x * self.x + self.y * self.y)
+        return math.sqrt(self.x ** 2 + self.y ** 2)
 
     def length(self):
         return self.magnitude()
