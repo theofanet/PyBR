@@ -22,6 +22,7 @@ if __name__ == '__main__':
     App.load_scene("main", Scenes.FirstScene())
     App.load_scene("menu", Scenes.Menu())
     App.load_scene("settings", Scenes.Settings())
+    App.load_scene("net", Scenes.NetworkScene())
     App.set_active_scene("main")
 
     App.run()

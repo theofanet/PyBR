@@ -3,8 +3,8 @@ from .Registry import Registry
 import PyGnin.Game as Game
 import PyGnin.IO as IO
 import PyGnin.Render as Render
-
 import PyGnin.Gui as Gui
+import PyGnin.Network as Network
 
 from .Core import App
 

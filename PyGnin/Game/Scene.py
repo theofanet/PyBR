@@ -59,3 +59,6 @@ class Scene(object):
 
     def add_sprites(self, *sprites):
         self._sprites.add(*sprites)
+
+    def remove_sprites(self, *sprites):
+        self._sprites.remove(*sprites)

@@ -37,6 +37,7 @@ from .widgets.settings import Keys
 from .widgets.scale import Scale
 from .widgets.switch import Switch
 from .widgets.sizebutton import SizeButton
+from .widgets.sizeinput import SizeInput
 
 # Import Menu last, so it can import the other widgets from here.
 from .widgets.menu import Menu

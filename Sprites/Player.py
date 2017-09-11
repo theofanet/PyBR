@@ -5,7 +5,7 @@ from .Bullet import Bullet
 
 
 class Player(Game.AnimatedSprite):
-    def __init__(self):
+    def __init__(self, active=True):
         super().__init__()
         self._config = Registry.registered("config")
         self._speed = 5
@@ -26,13 +26,18 @@ class Player(Game.AnimatedSprite):
         self._aim_color = None
         self.set_aim_color(list(map(int, self._config.get("aim", "color").split(","))))
         self._bullets = []
+        self._active = active
 
     def set_aim_color(self, col):
         self._aims.set_color(col)
         self._aim_color = col
 
     def update(self, *args):
+        if not self._active:
+            return
+
         x, y = self.get_position()
+
         if App.get_active_scene().get_camera():
             x_cam, y_cam = App.get_active_scene().get_camera().get_position()
         else:
@@ -94,7 +99,7 @@ class Player(Game.AnimatedSprite):
             self.set_animation("run-up")
         elif 225 < aim_angle < 315:
             self.set_animation("run-left")
-        IO.Mouse.set_position(self._aimPosition)
+        #IO.Mouse.set_position(self._aimPosition)
 
         for bullet in self._bullets:
             bullet.update(*args)

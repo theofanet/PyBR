@@ -37,7 +37,7 @@ class InputBox(Simple, SelectableText):
                          "col_selection": (118, 45, 215),
                          "col_focus": (255,255,255),
                          "col_focus_not": (200,200,200), "max_chars": 80,
-                         "repeat_begin": 300, "repeat_interval": 30}
+                         "repeat_begin": 300, "repeat_interval": 30, "background_col": (0, 0, 1)}
 
     _text_offset = _text_pos = 6
 
@@ -62,18 +62,18 @@ class InputBox(Simple, SelectableText):
         
         for key in ("default", "blink_interval", "col_focus", "col_focus_not",
                     "col_selection", "max_chars", "repeat_begin",
-                    "repeat_interval"):
+                    "repeat_interval", "background_col"):
             if key in kwargs:
                 self._settings[key] = kwargs[key]
 
     def _draw_base(self):
         # Active state background
         self._images["image"].fill(self._settings["col_focus"])
-        draw.rect(self._images["image"], (0,0,1), ((0,0), self.rect.size), 4)
+        draw.rect(self._images["image"], self._settings["background_col"], ((0,0), self.rect.size), 4)
 
         # Inactive state background
         self._images["inactive"].fill(self._settings["col_focus_not"])
-        draw.rect(self._images["inactive"], (0,0,1), ((0,0), self.rect.size), 4)
+        draw.rect(self._images["inactive"], self._settings["background_col"], ((0,0), self.rect.size), 4)
 
     # Store the input text as a list
     @property

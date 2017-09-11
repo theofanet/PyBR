@@ -1,5 +1,4 @@
 from PyGnin import *
-from PyGnin import *
 
 
 class Menu(Game.Scene):

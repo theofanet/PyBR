@@ -72,6 +72,8 @@ class App(object):
 
     @staticmethod
     def exit():
+        if App._activeScene:
+            App._scenes[App._activeScene].close_scene()
         if App._window:
             App._window = None
             pygame.quit()
