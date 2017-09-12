@@ -41,7 +41,8 @@ class Sprite(pygame.sprite.Sprite):
         n_surf = n_surf.convert_alpha(n_surf)
         n_surf.blit(self.image, pygame.Rect(0, 0, self.rect.width, self.rect.height))
         size = n_surf.get_size()
-        n_surf = pygame.transform.scale(n_surf, (size[0] * self._scale, size[1] * self._scale))
+        # n_surf = pygame.transform.scale(n_surf, (size[0] * self._scale, size[1] * self._scale))
+        n_surf = pygame.transform.scale(n_surf, (int(size[0] * self._scale), int(size[1] * self._scale)))
         self.image = n_surf
         self.rect = self.image.get_rect()
 

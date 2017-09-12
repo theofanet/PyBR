@@ -23,6 +23,7 @@ if __name__ == '__main__':
     App.load_scene("menu", Scenes.Menu())
     App.load_scene("settings", Scenes.Settings())
     App.load_scene("net", Scenes.NetworkScene())
-    App.set_active_scene("net")
+    App.load_scene("guiboude", Scenes.Guiboude())
+    App.set_active_scene("guiboude")
 
     App.run()
