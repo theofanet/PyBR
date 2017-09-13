@@ -77,7 +77,7 @@ class Map(object):
             tile_x = random.randint(self._tile_range[0], self._tile_range[1])
             tile_y = random.randint(self._tile_range[0], self._tile_range[1])
 
-            # rocks positions generation || algo de galerien !! :D
+            # rocks positions generation || algo de clochard !! :D
             while keep_going:
 
                 # X
@@ -194,6 +194,7 @@ class Map(object):
                 pygame.draw.circle(surface, (255, 0, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[0], 3)
                 pygame.draw.circle(surface, (0, 255, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[1], 2)
                 # pygame.draw.circle(surface, (255, 0, 0), (pos_x, pos_y), 4, 3)
+                pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, 256, 256), 2)
                 # ####################
 
                 self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y)
