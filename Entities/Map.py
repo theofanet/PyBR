@@ -29,8 +29,8 @@ class Map(object):
         self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
         # #####################################
 
-        self.generate(seed, frequency, water_lvl)
         self._size = (width * 16, height * 16)
+        self.generate(seed, frequency, water_lvl)
         self._mini_map = pygame.Surface((16 * width, 16 * height))
         self.draw(camera=None, surface=self._mini_map)
         self._mini_map = pygame.transform.scale(self._mini_map, (
@@ -267,10 +267,12 @@ class Map(object):
                     pygame.draw.circle(surface, (255, 0, 0),
                                        (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)),
                                        self._range_between_rocks[0], 2)
-                    pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, 256, 256), 2)
+                    pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y,
+                                                          self._rock_tileset.get_tile_size()[0],
+                                                          self._rock_tileset.get_tile_size()[1]), 2)
                 # ####################
 
-                self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y)
+                self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y, screen=surface)
 
             if IO.Keyboard.is_down(K_r):
                 self.debug_rocks = not self.debug_rocks
