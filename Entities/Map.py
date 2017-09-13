@@ -2,8 +2,8 @@ from PyGnin import *
 from opensimplex import OpenSimplex
 import pygame
 import random
-
 import math
+
 
 class Map(object):
     def __init__(self, width=0, height=0, seed=0, frequency=1.0, water_lvl=0.1):
@@ -24,8 +24,8 @@ class Map(object):
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
-        self._range_between_rocks = (200, 3000)
-        self._max_nb_rocks = 40
+        self._range_between_rocks = (100, 3000)
+        self._max_nb_rocks = 60
         self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
         # #####################################
 
@@ -89,7 +89,6 @@ class Map(object):
                     # ##################################
 
                     if used_pos:
-                        moy_used_pts = [0 for x in range(3)]
 
                         for pos in used_pos:
                             dist = int(self.calc_dist(current_pos, pos))
@@ -134,6 +133,7 @@ class Map(object):
             return None
         if not surface:
             surface = App.get_display()
+        tile_w, tile_h = self._rock_tileset.get_tile_size()
 
         if mini_map:
             surface.fill((0, 0, 0))
@@ -179,16 +179,17 @@ class Map(object):
                     pos_x -= camera.get_position()[0]
                     pos_y -= camera.get_position()[1]
 
+                pos_x -= tile_w/2
+                pos_y -= tile_h/2
+
                 # DEBUG ##############
                 if self.debug_rocks:
                     a = (pos_x, pos_y)
-                    c = (pos_x + self._rock_tileset.get_tile_size()[0], pos_y + self._rock_tileset.get_tile_size()[1])
+                    c = (pos_x + tile_w, pos_y + tile_h)
                     pygame.draw.circle(surface, (255, 0, 0),
                                        (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)),
                                        self._range_between_rocks[0], 2)
-                    pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y,
-                                                          self._rock_tileset.get_tile_size()[0],
-                                                          self._rock_tileset.get_tile_size()[1]), 2)
+                    pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, tile_w, tile_h), 2)
                 # ####################
 
                 self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y, screen=surface)
