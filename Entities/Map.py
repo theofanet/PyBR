@@ -20,6 +20,7 @@ class Map(object):
         }
 
         # Rocks ###############################
+        self.debug_rocks = False
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
@@ -189,12 +190,16 @@ class Map(object):
                     pos_y -= camera.get_position()[1]
 
                 # DEBUG ##############
-                a = (pos_x, pos_y)
-                c = (pos_x + 256, pos_y + 256)
-                pygame.draw.circle(surface, (255, 0, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[0], 3)
-                pygame.draw.circle(surface, (0, 255, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[1], 2)
-                # pygame.draw.circle(surface, (255, 0, 0), (pos_x, pos_y), 4, 3)
-                pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, 256, 256), 2)
+                if self.debug_rocks:
+                    a = (pos_x, pos_y)
+                    c = (pos_x + 256, pos_y + 256)
+                    pygame.draw.circle(surface, (255, 0, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[0], 3)
+                    pygame.draw.circle(surface, (0, 255, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[1], 2)
+                    # pygame.draw.circle(surface, (255, 0, 0), (pos_x, pos_y), 4, 3)
+                    pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, 256, 256), 2)
                 # ####################
 
                 self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y)
+
+            if IO.Keyboard.is_down(K_r):
+                self.debug_rocks = not self.debug_rocks
