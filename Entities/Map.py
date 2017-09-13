@@ -1,6 +1,7 @@
 from PyGnin import *
 from opensimplex import OpenSimplex
 import pygame
+import random
 
 
 class Map(object):
@@ -16,6 +17,16 @@ class Map(object):
             "rock": (2, 0),
             "grass": (1, 0)
         }
+
+        # Rocks ###############################
+        self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
+        self._rock_tileset.set_scale(0.6)
+        self._tile_range = (0, 7)
+        self._range_between_rocks = (1, 2000)
+        self._max_nb_rocks = 40
+        self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
+        # #####################################
+
         self.generate(seed, frequency, water_lvl)
         self._size = (width * 16, height * 16)
         self._mini_map = pygame.Surface((16 * width, 16 * height))
@@ -54,6 +65,55 @@ class Map(object):
                 e = generator.noise2d(frequency * nx, frequency * ny) / 2.0 + 0.5
                 self.tiles[y][x] = self.get_surface(e, water_lvl)
 
+        # Rocks ###############################
+        used_pos = []
+        for rock in self._rocks:
+
+            keep_going = True
+            pos_x = 0
+            pos_y = 0
+
+            tile_x = random.randint(self._tile_range[0], self._tile_range[1])
+            tile_y = random.randint(self._tile_range[0], self._tile_range[1])
+
+            while keep_going:
+
+                # print(pos_x, pos_y)
+
+                if pos_x == 0:
+                    pos_x = random.randint(0, 3200)  # voir pour le self.get_size
+                    print("pos_x = " + repr(pos_x))
+
+                    if used_pos:
+                        for pos in used_pos:
+                            if abs(pos_x-pos[0]) not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                                # print("x = " + repr(abs(pos_x-pos[0])))
+                                pos_x = 0
+
+                if pos_y == 0:
+                    pos_y = random.randint(0, 3200) # voir pour le self.get_size
+                    print("pos_y = " + repr(pos_y))
+
+                    if used_pos:
+                        for pos in used_pos:
+                            if abs(pos_y-pos[1]) not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                                # print("y = " + repr(abs(pos_y-pos[0])))
+                                pos_y = 0
+
+                if pos_x != 0 and pos_y != 0:
+                    used_pos.append((pos_x, pos_y))
+                    print(used_pos)
+                    keep_going = False
+
+            rock["tile"][0] = tile_x
+            rock["tile"][1] = tile_y
+            rock["pos"][0] = pos_x
+            rock["pos"][1] = pos_y
+        # #####################################
+
+        print(self._rocks)
+        # print(used_pos)
+
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
         if not self.tiles:
             return None
@@ -91,3 +151,32 @@ class Map(object):
                                 rect.y -= camera.get_position()[1]
                             col, row = self.tiles[y][x]
                             self._tileSet.draw_tile(col, row, rect.x, rect.y, screen=surface)
+
+            # Rocks ###############################
+            for rock in self._rocks:
+
+                tile_x = rock["tile"][0]
+                tile_y = rock["tile"][1]
+                pos_x = rock["pos"][0]
+                pos_y = rock["pos"][1]
+
+                if camera:
+                    pos_x -= camera.get_position()[0]
+                    pos_y -= camera.get_position()[1]
+
+                self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y)
+
+            # r_x, r_y = (50, 50)
+            # r2_x, r2_y = (50, 450)
+            # if camera:
+            #     r_x -= camera.get_position()[0]
+            #     r_y -= camera.get_position()[1]
+            #     r2_x -= camera.get_position()[0]
+            #     r2_y -= camera.get_position()[1]
+            # self._rock_tileset.draw_tile(4, 2, r_x, r_y)
+            # self._rock_tileset.draw_tile(4, 2, r2_x, r2_y)
+            # #####################################
+
+            # test1 = (10, 200)
+            # test2 = (20, 300)
+            # print(tuple(set(test1) ^ set(test2)))

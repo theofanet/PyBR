@@ -1,15 +1,24 @@
 from PyGnin import *
 
+
+# class Rock(Game.Sprite):
+#
+#     def __init__(self):
+#         super().__init__()
+#         self.load_image('assets/rock_test.jpg')
+#         self.set_scale(0.2)
+
+
 class Guiboude(Game.Scene):
 
     def __init__(self):
         super().__init__()
 
         # simple rock !!!!
-        self.rock = Rock()
-        self.add_sprites(self.rock)
-        self.rock_image = Render.Image('assets/rock_test.jpg')
-        self._direction = None
+        # self.rock = Rock()
+        # self.add_sprites(self.rock)
+        # self.rock_image = Render.Image('assets/rock_test.jpg')
+        # self._direction = None
 
         #tilset rock !!!!
         self._rock_tileset = Render.TileSet('assets/rocks_rotated.png', (256, 256))
@@ -43,7 +52,7 @@ class Guiboude(Game.Scene):
         self._nameInput.remove()
         self._button.remove()
 
-    def update(self):
+    def update(self): pass
 
         # tileset rock !!!!
         # self._time += App.get_time()
@@ -59,29 +68,29 @@ class Guiboude(Game.Scene):
             ####
 
         #test camera
-        x, y = self.rock.get_position()
-
-        if IO.Keyboard.is_held(K_s):
-            y += 5
-            self._direction = DIR_DOWN
-        elif IO.Keyboard.is_held(K_w):
-            y -= 5
-            self._direction = DIR_UP
-        elif IO.Keyboard.is_held(K_a):
-            x -= 5
-            self._direction = DIR_LEFT
-        elif IO.Keyboard.is_held(K_d):
-            x += 5
-            self._direction = DIR_RIGHT
-
-        if IO.Keyboard.is_up(K_a) \
-                or IO.Keyboard.is_up(K_d) \
-                or IO.Keyboard.is_up(K_w) \
-                or IO.Keyboard.is_up(K_s):
-            self._direction = None
-
-        self.rock.set_position(x, y)
-        self._camera.update(self.rock.get_position(), self._direction)
+        # x, y = self.rock.get_position()
+        #
+        # if IO.Keyboard.is_held(K_s):
+        #     y += 5
+        #     self._direction = DIR_DOWN
+        # elif IO.Keyboard.is_held(K_w):
+        #     y -= 5
+        #     self._direction = DIR_UP
+        # elif IO.Keyboard.is_held(K_a):
+        #     x -= 5
+        #     self._direction = DIR_LEFT
+        # elif IO.Keyboard.is_held(K_d):
+        #     x += 5
+        #     self._direction = DIR_RIGHT
+        #
+        # if IO.Keyboard.is_up(K_a) \
+        #         or IO.Keyboard.is_up(K_d) \
+        #         or IO.Keyboard.is_up(K_w) \
+        #         or IO.Keyboard.is_up(K_s):
+        #     self._direction = None
+        #
+        # self.rock.set_position(x, y)
+        # self._camera.update(self.rock.get_position(), self._direction)
 
     def draw(self):
         App.get_display().fill((0, 0, 0))
@@ -104,10 +113,3 @@ class Guiboude(Game.Scene):
 
     def button_clicked(self):
         print(self._nameInput.text)
-
-class Rock(Game.Sprite):
-
-    def __init__(self):
-        super().__init__()
-        self.load_image('assets/rock_test.jpg')
-        self.set_scale(0.2)
