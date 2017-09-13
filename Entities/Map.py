@@ -22,7 +22,7 @@ class Map(object):
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
-        self._range_between_rocks = (1, 2000)
+        self._range_between_rocks = (1, 3000)
         self._max_nb_rocks = 40
         self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
         # #####################################
@@ -76,43 +76,66 @@ class Map(object):
             tile_x = random.randint(self._tile_range[0], self._tile_range[1])
             tile_y = random.randint(self._tile_range[0], self._tile_range[1])
 
+            # rocks positions generation
             while keep_going:
 
-                # print(pos_x, pos_y)
-
+                # X
                 if pos_x == 0:
                     pos_x = random.randint(0, 3200)  # voir pour le self.get_size
-                    print("pos_x = " + repr(pos_x))
+                    print("pos_x: " + repr(pos_x))
 
                     if used_pos:
                         for pos in used_pos:
-                            if abs(pos_x-pos[0]) not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                                # print("x = " + repr(abs(pos_x-pos[0])))
+                            diff_x = abs(pos_x-pos[0])
+                            # LOG ###########################################################################
+                            print("pos_x: " + repr(pos_x) + " used: " + repr(pos[0]) + " diff: " + repr(diff_x))
+                            # ###############################################################################
+                            if diff_x not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                                # LOG #########################################################
+                                print("bad_range_x = " + repr(diff_x)
+                                      + " !(" + repr(self._range_between_rocks[0])
+                                      + " <> " + repr(self._range_between_rocks[1]) + ")")
+                                # #############################################################
                                 pos_x = 0
+                                break
 
+                # Y
                 if pos_y == 0:
                     pos_y = random.randint(0, 3200) # voir pour le self.get_size
-                    print("pos_y = " + repr(pos_y))
+                    print("pos_y: " + repr(pos_y))
 
                     if used_pos:
                         for pos in used_pos:
-                            if abs(pos_y-pos[1]) not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                                # print("y = " + repr(abs(pos_y-pos[0])))
+                            diff_y = abs(pos_y-pos[1])
+                            # LOG ###########################################################################
+                            print("pos_y: " + repr(pos_y) + " || used: " + repr(pos[1]) + " diff: " + repr(diff_y))
+                            # ###############################################################################
+                            if diff_y not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                                # LOG #########################################################
+                                print("bad_range_y = " + repr(diff_y)
+                                      + " !(" + repr(self._range_between_rocks[0])
+                                      + " <> " + repr(self._range_between_rocks[1]) + ")")
+                                # #############################################################
                                 pos_y = 0
+                                break
 
+                # NEXT
                 if pos_x != 0 and pos_y != 0:
                     used_pos.append((pos_x, pos_y))
+                    # LOG #########
                     print(used_pos)
+                    # #############
                     keep_going = False
 
             rock["tile"][0] = tile_x
             rock["tile"][1] = tile_y
             rock["pos"][0] = pos_x
             rock["pos"][1] = pos_y
-        # #####################################
 
+        # LOG ############
         print(self._rocks)
         # print(used_pos)
+        # ################
 
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
         if not self.tiles:
