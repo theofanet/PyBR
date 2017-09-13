@@ -72,72 +72,20 @@ class Map(object):
         for rock in self._rocks:
 
             keep_going = True
-            pos_x = 0
-            pos_y = 0
-            x_y_diff = list()
-            moy_used_pts = list()
 
             tile_x = random.randint(self._tile_range[0], self._tile_range[1])
             tile_y = random.randint(self._tile_range[0], self._tile_range[1])
 
             while keep_going:
 
-                # rocks positions generation || algo de clochard !! :D
-                # # X
-                # if pos_x == 0:
-                #     pos_x = random.randint(0, 3200)  # voir pour le self.get_size
-                #     print("pos_x: " + repr(pos_x))
-                #
-                #     if used_pos:
-                #         for pos in used_pos:
-                #             diff_x = abs(pos_x-pos[0])
-                #             # LOG ###########################################################################
-                #             print("pos_x: " + repr(pos_x) + " used: " + repr(pos[0]) + " diff: " + repr(diff_x))
-                #             # ###############################################################################
-                #             if diff_x not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                #                 # LOG #########################################################
-                #                 print("bad_range_x = " + repr(diff_x)
-                #                       + " !(" + repr(self._range_between_rocks[0])
-                #                       + " <> " + repr(self._range_between_rocks[1]) + ")")
-                #                 # #############################################################
-                #                 pos_x = 0
-                #                 break
-                #
-                # # Y
-                # if pos_y == 0:
-                #     pos_y = random.randint(0, 3200) # voir pour le self.get_size
-                #     print("pos_y: " + repr(pos_y))
-                #
-                #     if used_pos:
-                #         for pos in used_pos:
-                #             diff_y = abs(pos_y-pos[1])
-                #             # LOG ###########################################################################
-                #             print("pos_y: " + repr(pos_y) + " || used: " + repr(pos[1]) + " diff: " + repr(diff_y))
-                #             # ###############################################################################
-                #             if diff_y not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                #                 # LOG #########################################################
-                #                 print("bad_range_y = " + repr(diff_y)
-                #                       + " !(" + repr(self._range_between_rocks[0])
-                #                       + " <> " + repr(self._range_between_rocks[1]) + ")")
-                #                 # #############################################################
-                #                 pos_y = 0
-                #                 break
-
                 # NEW ALGO
                 current_pos = list()
 
                 if not current_pos:
 
-                    # if x_y_diff:
-                    #     current_pos = x_y_diff
-                    #     x_y_diff = list()
-                    #     # LOG #################################
-                    #     print("MODIFIED: " + repr(current_pos))
-                    #     # #####################################
-                    # else:
                     current_pos = (random.randint(0, 3200), random.randint(0, 3200))  # voir pour le self.get_size
                     # LOG ##############################
-                    print("current" + repr(current_pos))
+                    # print("current" + repr(current_pos))
                     # ##################################
 
                     if used_pos:
@@ -146,20 +94,16 @@ class Map(object):
                         for pos in used_pos:
                             dist = int(self.calc_dist(current_pos, pos))
 
-                            # moy_used_pts[0] += 1
-                            # moy_used_pts[1] += pos[0]
-                            # moy_used_pts[2] += pos[1]
-
                             # LOG ###########################################################################
-                            print("current:" + repr(current_pos) + " used:" + repr(pos) + " dist:" + repr(int(dist)))
+                            # print("current:" + repr(current_pos) + " used:" + repr(pos) + " dist:" + repr(int(dist)))
                             # ###############################################################################
 
                             if dist not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
 
                                 # LOG #########################################################
-                                print("bad_range = " + repr(dist)
-                                      + " !(" + repr(self._range_between_rocks[0])
-                                      + " <> " + repr(self._range_between_rocks[1]) + ")")
+                                # print("bad_range = " + repr(dist)
+                                #       + " !(" + repr(self._range_between_rocks[0])
+                                #       + " <> " + repr(self._range_between_rocks[1]) + ")")
                                 # #############################################################
                                 current_pos = list()
                                 break
@@ -169,36 +113,11 @@ class Map(object):
                     used_pos.append(current_pos)
 
                     # LOG #########
-                    print("LIST POINTS ====> " + repr(used_pos))
-                    print("LIST LEN    ====> " + repr(len(used_pos)))
+                    # print("LIST POINTS ====> " + repr(used_pos))
+                    # print("LIST LEN    ====> " + repr(len(used_pos)))
                     # #############
 
                     keep_going = False
-
-                # elif moy_used_pts:
-                #
-                #     # LOG #########
-                #     print("MOY. USED POINTS ====> " + repr(moy_used_pts))
-                #     # #############
-                #
-                #     x_diff = int(moy_used_pts[1]/moy_used_pts[0])
-                #     y_diff = int(moy_used_pts[2]/moy_used_pts[0])
-                #
-                #     if x_diff < int(self._range_between_rocks[1]/2):
-                #         x_diff = x_diff + int(self._range_between_rocks[0]/4)
-                #     elif x_diff > int(self._range_between_rocks[1]/2):
-                #         x_diff = x_diff - int(self._range_between_rocks[0]/4)
-                #
-                #     if y_diff < int(self._range_between_rocks[1]/2):
-                #         y_diff = y_diff + int(self._range_between_rocks[0]/4)
-                #     elif y_diff > int(self._range_between_rocks[1]/2):
-                #         y_diff = y_diff - int(self._range_between_rocks[0]/4)
-                #
-                #         print("x_diff & y_diff: " + repr((x_diff, y_diff)))
-                #
-                #     if x_diff and y_diff:
-                #         x_y_diff = (x_diff, y_diff)
-                #         print("x_y_diff: " + repr(x_y_diff))
 
             rock["tile"][0] = tile_x
             rock["tile"][1] = tile_y
@@ -263,7 +182,7 @@ class Map(object):
                 # DEBUG ##############
                 if self.debug_rocks:
                     a = (pos_x, pos_y)
-                    c = (pos_x + 256, pos_y + 256)
+                    c = (pos_x + self._rock_tileset.get_tile_size()[0], pos_y + self._rock_tileset.get_tile_size()[1])
                     pygame.draw.circle(surface, (255, 0, 0),
                                        (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)),
                                        self._range_between_rocks[0], 2)
