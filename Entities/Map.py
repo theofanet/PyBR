@@ -2,6 +2,7 @@ from PyGnin import *
 from opensimplex import OpenSimplex
 import pygame
 import random
+import math
 
 
 class Map(object):
@@ -22,7 +23,7 @@ class Map(object):
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
-        self._range_between_rocks = (1, 3000)
+        self._range_between_rocks = (100, 300)
         self._max_nb_rocks = 40
         self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
         # #####################################
@@ -76,7 +77,7 @@ class Map(object):
             tile_x = random.randint(self._tile_range[0], self._tile_range[1])
             tile_y = random.randint(self._tile_range[0], self._tile_range[1])
 
-            # rocks positions generation
+            # rocks positions generation || algo de galerien !! :D
             while keep_going:
 
                 # X
@@ -84,40 +85,40 @@ class Map(object):
                     pos_x = random.randint(0, 3200)  # voir pour le self.get_size
                     print("pos_x: " + repr(pos_x))
 
-                    if used_pos:
-                        for pos in used_pos:
-                            diff_x = abs(pos_x-pos[0])
-                            # LOG ###########################################################################
-                            print("pos_x: " + repr(pos_x) + " used: " + repr(pos[0]) + " diff: " + repr(diff_x))
-                            # ###############################################################################
-                            if diff_x not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                                # LOG #########################################################
-                                print("bad_range_x = " + repr(diff_x)
-                                      + " !(" + repr(self._range_between_rocks[0])
-                                      + " <> " + repr(self._range_between_rocks[1]) + ")")
-                                # #############################################################
-                                pos_x = 0
-                                break
+                    # if used_pos:
+                    #     for pos in used_pos:
+                    #         diff_x = abs(pos_x-pos[0])
+                    #         # LOG ###########################################################################
+                    #         print("pos_x: " + repr(pos_x) + " used: " + repr(pos[0]) + " diff: " + repr(diff_x))
+                    #         # ###############################################################################
+                    #         if diff_x not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                    #             # LOG #########################################################
+                    #             print("bad_range_x = " + repr(diff_x)
+                    #                   + " !(" + repr(self._range_between_rocks[0])
+                    #                   + " <> " + repr(self._range_between_rocks[1]) + ")")
+                    #             # #############################################################
+                    #             pos_x = 0
+                    #             break
 
                 # Y
                 if pos_y == 0:
                     pos_y = random.randint(0, 3200) # voir pour le self.get_size
                     print("pos_y: " + repr(pos_y))
 
-                    if used_pos:
-                        for pos in used_pos:
-                            diff_y = abs(pos_y-pos[1])
-                            # LOG ###########################################################################
-                            print("pos_y: " + repr(pos_y) + " || used: " + repr(pos[1]) + " diff: " + repr(diff_y))
-                            # ###############################################################################
-                            if diff_y not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
-                                # LOG #########################################################
-                                print("bad_range_y = " + repr(diff_y)
-                                      + " !(" + repr(self._range_between_rocks[0])
-                                      + " <> " + repr(self._range_between_rocks[1]) + ")")
-                                # #############################################################
-                                pos_y = 0
-                                break
+                    # if used_pos:
+                    #     for pos in used_pos:
+                    #         diff_y = abs(pos_y-pos[1])
+                    #         # LOG ###########################################################################
+                    #         print("pos_y: " + repr(pos_y) + " || used: " + repr(pos[1]) + " diff: " + repr(diff_y))
+                    #         # ###############################################################################
+                    #         if diff_y not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                    #             # LOG #########################################################
+                    #             print("bad_range_y = " + repr(diff_y)
+                    #                   + " !(" + repr(self._range_between_rocks[0])
+                    #                   + " <> " + repr(self._range_between_rocks[1]) + ")")
+                    #             # #############################################################
+                    #             pos_y = 0
+                    #             break
 
                 # NEXT
                 if pos_x != 0 and pos_y != 0:
@@ -187,19 +188,12 @@ class Map(object):
                     pos_x -= camera.get_position()[0]
                     pos_y -= camera.get_position()[1]
 
+                # DEBUG ##############
+                a = (pos_x, pos_y)
+                c = (pos_x + 256, pos_y + 256)
+                pygame.draw.circle(surface, (255, 0, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[0], 3)
+                pygame.draw.circle(surface, (0, 255, 0), (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)), self._range_between_rocks[1], 2)
+                # pygame.draw.circle(surface, (255, 0, 0), (pos_x, pos_y), 4, 3)
+                # ####################
+
                 self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y)
-
-            # r_x, r_y = (50, 50)
-            # r2_x, r2_y = (50, 450)
-            # if camera:
-            #     r_x -= camera.get_position()[0]
-            #     r_y -= camera.get_position()[1]
-            #     r2_x -= camera.get_position()[0]
-            #     r2_y -= camera.get_position()[1]
-            # self._rock_tileset.draw_tile(4, 2, r_x, r_y)
-            # self._rock_tileset.draw_tile(4, 2, r2_x, r2_y)
-            # #####################################
-
-            # test1 = (10, 200)
-            # test2 = (20, 300)
-            # print(tuple(set(test1) ^ set(test2)))

@@ -43,30 +43,30 @@ class Player(Game.AnimatedSprite):
         else:
             x_cam, y_cam = (0, 0)
 
-        if IO.Keyboard.is_held(K_LEFT):
+        if IO.Keyboard.is_held(K_a):
             if self._direction != PyGnin.DIR_UP and self._direction != PyGnin.DIR_DOWN:
                 self.set_animation("run-left", play=True, reset=self._direction != PyGnin.DIR_LEFT)
                 self._direction = PyGnin.DIR_LEFT
             x -= self._speed
-        elif IO.Keyboard.is_held(K_RIGHT):
+        elif IO.Keyboard.is_held(K_d):
             if self._direction != PyGnin.DIR_UP and self._direction != PyGnin.DIR_DOWN:
                 self.set_animation("run-right", play=True, reset=self._direction != PyGnin.DIR_RIGHT)
                 self._direction = PyGnin.DIR_RIGHT
             x += self._speed
 
-        if IO.Keyboard.is_held(K_UP):
+        if IO.Keyboard.is_held(K_w):
             self.set_animation("run-up", play=True, reset=self._direction != PyGnin.DIR_UP)
             self._direction = PyGnin.DIR_UP
             y -= self._speed
-        elif IO.Keyboard.is_held(K_DOWN):
+        elif IO.Keyboard.is_held(K_s):
             self.set_animation("run-down", play=True, reset=self._direction != PyGnin.DIR_DOWN)
             self._direction = PyGnin.DIR_DOWN
             y += self._speed
 
-        if IO.Keyboard.is_up(K_LEFT) \
-                or IO.Keyboard.is_up(K_RIGHT) \
-                or IO.Keyboard.is_up(K_UP)\
-                or IO.Keyboard.is_up(K_DOWN):
+        if IO.Keyboard.is_up(K_a) \
+                or IO.Keyboard.is_up(K_d) \
+                or IO.Keyboard.is_up(K_w)\
+                or IO.Keyboard.is_up(K_s):
             self._direction = None
             self.stop_animation(reset=True)
 
