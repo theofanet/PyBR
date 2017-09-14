@@ -9,7 +9,8 @@ class Rock(Game.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.debug_rocks = False
+        self.debug_rocks_shapes = False
+        self.debug_rocks_values = True
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
@@ -41,7 +42,7 @@ class Rock(Game.Sprite):
 
                     current_pos = (random.randint(0, 3200), random.randint(0, 3200))  # voir pour le self.get_size
                     # LOG ##############################
-                    if self.debug_rocks:
+                    if self.debug_rocks_values:
                         print("current" + repr(current_pos))
                     # ##################################
 
@@ -51,13 +52,13 @@ class Rock(Game.Sprite):
                             dist = int(self.calc_dist(current_pos, pos))
 
                             # LOG ###########################################################################
-                            if self.debug_rocks:
+                            if self.debug_rocks_values:
                                 print("current:" + repr(current_pos) + " used:" + repr(pos) + " dist:" + repr(int(dist)))
                             # ###############################################################################
 
                             if dist not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
                                 # LOG #########################################################
-                                if self.debug_rocks:
+                                if self.debug_rocks_values:
                                     print("bad_range = " + repr(dist)
                                           + " !(" + repr(self._range_between_rocks[0])
                                           + " <> " + repr(self._range_between_rocks[1]) + ")")
@@ -70,7 +71,7 @@ class Rock(Game.Sprite):
                     used_pos.append(current_pos)
 
                     # LOG #########
-                    if self.debug_rocks:
+                    if self.debug_rocks_values:
                         print("LIST POINTS ====> " + repr(used_pos))
                         print("LIST LEN    ====> " + repr(len(used_pos)))
                     # #############
@@ -83,14 +84,14 @@ class Rock(Game.Sprite):
             rock["pos"][1] = current_pos[1]
 
         # LOG ############
-        if self.debug_rocks:
+        if self.debug_rocks_values:
             print(self._rocks)
         # ################
 
     def draw(self, surface, camera=None):
 
         if IO.Keyboard.is_down(K_r):
-            self.debug_rocks = not self.debug_rocks
+            self.debug_rocks_shapes = not self.debug_rocks_shapes
 
         tile_w, tile_h = self._rock_tileset.get_tile_size()
 
@@ -109,7 +110,7 @@ class Rock(Game.Sprite):
             pos_y -= tile_h / 2
 
             # DEBUG ##############
-            if self.debug_rocks:
+            if self.debug_rocks_shapes:
                 a = (pos_x, pos_y)
                 c = (pos_x + tile_w, pos_y + tile_h)
                 pygame.draw.circle(surface, (255, 0, 0),
