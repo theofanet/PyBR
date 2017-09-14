@@ -9,7 +9,7 @@ class SubScene(object):
 
     def _initiate_data(self, **kargs): pass
 
-    def draw(self): pass
+    def draw(self, camera=None, screen=None): pass
 
     def update(self): return True
 

@@ -2,11 +2,10 @@ from PyGnin import *
 import pygame
 
 
-class Settings(Game.Scene):
+class SoloSettings(Game.SubScene):
     def __init__(self):
         super().__init__()
-        self._returnButton = Gui.Button(label="Return", pos=(10, App.get_screen_size()[1] - 60))
-        self._returnButton.on_click = Settings.return_menu
+        self.returnButton = Gui.Button(label="Return", pos=(10, App.get_screen_size()[1] - 60))
 
         self._restartLabel = Gui.Label(
             text="Settings with * need the application to be restarted",
@@ -16,6 +15,7 @@ class Settings(Game.Scene):
         self._saveButton = Gui.Button(label="Save", pos=(App.get_screen_size()[0] - 120, App.get_screen_size()[1] - 60))
         self._saveButton.on_click = self.save_settings
 
+        # AIMS IMG AND BUTTONS
         self._aimLabel = Gui.Label(text="Aim type", pos=(10, 5))
         self._aimsTileSet = Render.TileSet("assets/aims.png", (188, 200))
         self._aimsTileSet.set_scale(0.2)
@@ -41,6 +41,7 @@ class Settings(Game.Scene):
         self._aimsButton[7].on_click = self.select_aim_12
         self._aimsButton[8].on_click = self.select_aim_22
 
+        # COLORS SCALES AND LABELS
         r, g, b = list(map(int, Registry.registered("config").get("aim", "color").split(",")))
         self._aimColorLabel = Gui.Label(text="Aim color", pos=(10, 185))
         self._aimColorLabelRed = Gui.Label(text="Red", pos=(20, 220))
@@ -53,21 +54,48 @@ class Settings(Game.Scene):
         self._aimsColorB = Gui.Scale(min=0, max=255, min_step=1, show_value=True, pos=(100, 300), col=(0, 0, 100))
         self._aimsColorB.value = b
 
+        # SHOW FPS SWITCH
         self._showFpsLabel = Gui.Label(text="Show FPS", pos=(350, 15))
         self._showFpsSwitch = Gui.Switch(
             state=Registry.registered("config").getboolean("window", "show_fps"),
             pos=(450, 10)
         )
 
+        # FULL SCREEN SWITCH
         self._fullScreenLabel = Gui.Label(text="* Full screen", pos=(350, 45))
         self._fullScreenSwitch = Gui.Switch(
             state=Registry.registered("config").getboolean("window", "fullscreen"),
             pos=(450, 40)
         )
 
-    def _load_resources(self):
+        # MAP SETTINGS
+        self._mapLabel = Gui.Label(text="Map", pos=(350, 100))
+        self._mapFrequencyLabel = Gui.Label(text="Frequency", pos=(350, 150))
+        self._mapFrequencyScale = Gui.Scale(min=0, max=300, min_step=0.1, show_value=True, pos=(450, 132))
+        self._mapFrequencyScale.value = Registry.registered("config").getfloat("map", "frequency")
+
+        self._mapWaterLvlLabel = Gui.Label(text="Water lvl", pos=(350, 200))
+        self._mapWaterLvlScale = Gui.Scale(min=-1.0, max=1.0, min_step=0.1, show_value=True, pos=(450, 182))
+        self._mapWaterLvlScale.value = Registry.registered("config").getfloat("map", "water_level")
+
+        self._reloadMapLabel = Gui.Label(text="Reload map", pos=(470, 100))
+        self.reloadMapSwitch = Gui.Switch(state=False, pos=(550, 96))
+
+    def activate(self):
         App.show_cursor(True)
-        self._returnButton.add()
+        self._selected_aim = list(Registry.registered("config").get("aim", "type").split(","))
+        r, g, b = list(map(int, Registry.registered("config").get("aim", "color").split(",")))
+        self._aimsColorR.value = r
+        self._aimsColorG.value = g
+        self._aimsColorB.value = b
+        self._showFpsSwitch.config(state=Registry.registered("config").getboolean("window", "show_fps"))
+        self._fullScreenSwitch.config(state=Registry.registered("config").getboolean("window", "fullscreen"))
+        self._mapFrequencyScale.value = Registry.registered("config").getfloat("map", "frequency")
+        self._mapWaterLvlScale.value = Registry.registered("config").getfloat("map", "water_level")
+        self.add_gui()
+
+    def add_gui(self):
+        self.returnButton.add()
         self._saveButton.add()
         self._aimLabel.add()
         for button in self._aimsButton:
@@ -84,9 +112,16 @@ class Settings(Game.Scene):
         self._fullScreenLabel.add()
         self._fullScreenSwitch.add()
         self._restartLabel.add()
+        self._mapLabel.add()
+        self._mapFrequencyLabel.add()
+        self._mapFrequencyScale.add()
+        self._mapWaterLvlLabel.add()
+        self._mapWaterLvlScale.add()
+        self.reloadMapSwitch.add()
+        self._reloadMapLabel.add()
 
-    def close_scene(self):
-        self._returnButton.remove(False)
+    def remove_gui(self):
+        self.returnButton.remove(False)
         self._saveButton.remove(False)
         self._aimLabel.remove(False)
         for button in self._aimsButton:
@@ -103,36 +138,45 @@ class Settings(Game.Scene):
         self._fullScreenLabel.remove(False)
         self._fullScreenSwitch.remove(False)
         self._restartLabel.remove(False)
+        self._mapLabel.remove(False)
+        self._mapFrequencyLabel.remove(False)
+        self._mapFrequencyScale.remove(False)
+        self._mapWaterLvlLabel.remove(False)
+        self._mapWaterLvlScale.remove(False)
+        self.reloadMapSwitch.remove(False)
+        self._reloadMapLabel.remove(False)
 
-    def draw(self):
-        App.get_display().fill((0, 0, 0))
+    def close(self):
+        self.remove_gui()
+
+    def draw(self, camera=None, screen=None):
+        if not screen:
+            screen = App.get_display()
+
+        screen.fill((0, 0, 0))
         Gui.update(App.get_time())
 
         ssr, ssc = self._selected_aim
         sx, sy = [int(ssr)*50 + 36, int(ssc)*50 + 34]
-        pygame.draw.rect(App.get_display(), (10, 200, 20), pygame.Rect(sx, sy, 29, 30))
+        pygame.draw.rect(screen, (10, 200, 20), pygame.Rect(sx, sy, 29, 30))
 
-        self._aimsTileSet.draw_tile(0, 0, 50, 50, True)
-        self._aimsTileSet.draw_tile(1, 0, 100, 50, True)
-        self._aimsTileSet.draw_tile(2, 0, 150, 50, True)
-        self._aimsTileSet.draw_tile(0, 1, 50, 100, True)
-        self._aimsTileSet.draw_tile(1, 1, 100, 100, True)
-        self._aimsTileSet.draw_tile(2, 1, 150, 100, True)
-        self._aimsTileSet.draw_tile(0, 2, 50, 150, True)
-        self._aimsTileSet.draw_tile(1, 2, 100, 150, True)
-        self._aimsTileSet.draw_tile(2, 2, 150, 150, True)
+        self._aimsTileSet.draw_tile(0, 0, 50, 50, True, screen=screen)
+        self._aimsTileSet.draw_tile(1, 0, 100, 50, True, screen=screen)
+        self._aimsTileSet.draw_tile(2, 0, 150, 50, True, screen=screen)
+        self._aimsTileSet.draw_tile(0, 1, 50, 100, True, screen=screen)
+        self._aimsTileSet.draw_tile(1, 1, 100, 100, True, screen=screen)
+        self._aimsTileSet.draw_tile(2, 1, 150, 100, True, screen=screen)
+        self._aimsTileSet.draw_tile(0, 2, 50, 150, True, screen=screen)
+        self._aimsTileSet.draw_tile(1, 2, 100, 150, True, screen=screen)
+        self._aimsTileSet.draw_tile(2, 2, 150, 150, True, screen=screen)
 
         pygame.draw.rect(
-            App.get_display(),
+            screen,
             (self._aimsColorR.value, self._aimsColorG.value, self._aimsColorB.value),
             pygame.Rect(75, 184, 25, 25)
         )
 
-        super().draw()
-
-    @staticmethod
-    def return_menu():
-        App.set_active_scene("menu")
+        super().draw(camera, screen)
 
     def select_aim_00(self):
         self._selected_aim = ["0", "0"]
@@ -170,6 +214,8 @@ class Settings(Game.Scene):
         ]))
         Registry.registered("config").set("window", "show_fps", str(self._showFpsSwitch.state))
         Registry.registered("config").set("window", "fullscreen", str(self._fullScreenSwitch.state))
+        Registry.registered("config").set("map", "frequency", str(self._mapFrequencyScale.value))
+        Registry.registered("config").set("map", "water_level", str(self._mapWaterLvlScale.value))
         App.show_fps(self._showFpsSwitch.state)
         with open('config.ini', 'w') as configfile:
             Registry.registered("config").write(configfile)

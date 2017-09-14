@@ -1,5 +1,4 @@
 import pygame
-from ..Registry import Registry
 from ..Core import App
 
 

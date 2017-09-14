@@ -2,11 +2,15 @@ from PyGnin import *
 from opensimplex import OpenSimplex
 from Entities.Rock import *
 import pygame
+import math
 
 
 class Map(object):
     def __init__(self, width=0, height=0, seed=0, frequency=1.0, water_lvl=0.1):
         super().__init__()
+        self._font = Render.Font("assets/Permanent_Marker/PermanentMarker-Regular.ttf")
+        App.draw_loading("Generating map ...", self._font)
+
         self.width = width
         self.height = height
         self.tiles = None
@@ -21,16 +25,13 @@ class Map(object):
 
         # Rocks ###############################
         # self._rocks = Rock(40)
-        self._optimizer = Optimizer(self._size)
+        self._optimizer = None
+        if Registry.registered("config").getboolean("map", "load_rocks"):
+            self._optimizer = Optimizer(self._size)
         # #####################################
 
+        self._mini_map = None
         self.generate(seed, frequency, water_lvl)
-        self._mini_map = pygame.Surface((16 * width, 16 * height))
-        self.draw(camera=None, surface=self._mini_map)
-        self._mini_map = pygame.transform.scale(self._mini_map, (
-            App.get_screen_size()[0] - 40,
-            App.get_screen_size()[1] - 40
-        ))
 
     def get_size(self):
         return self._size
@@ -38,9 +39,9 @@ class Map(object):
     def get_surface(self, e, water=0.1):
         if e < water:
             return self._surfaces["water"]
-        elif e < water + 0.2:
-            return self._surfaces["grass"]
         elif e < water + 0.3:
+            return self._surfaces["grass"]
+        elif e < water + 0.5:
             return self._surfaces["dirt"]
         else:
             return self._surfaces["rock"]
@@ -53,18 +54,34 @@ class Map(object):
         generator = OpenSimplex(seed=seed)
 
         self.tiles = [[0 for x in range(self.width)] for y in range(self.height)]
+        App.draw_loading("Generating map : tiles ...", self._font)
 
+        done = 0
+        to_do = self.width*self.height
         for y in range(self.height):
             for x in range(self.width):
                 nx = x / self.width - 0.5
                 ny = y / self.height - 0.5
                 e = generator.noise2d(frequency * nx, frequency * ny) / 2.0 + 0.5
                 self.tiles[y][x] = self.get_surface(e, water_lvl)
+                done += 1
+                #App.draw_loading("Generating tiles ({0}/{1}) ...".format(done, to_do))
 
         # Rocks ###############################
-        self._optimizer.generate()
+        if self._optimizer:
+            App.draw_loading("Generating map : rocks ...", self._font)
+            self._optimizer.generate()
         # self._rocks.generate()
         # #####################################
+
+        # Mini map generation
+        App.draw_loading("Generating map : mini map ...", self._font)
+        self._mini_map = pygame.Surface((16 * self.width, 16 * self.height))
+        self.draw(camera=None, surface=self._mini_map)
+        self._mini_map = pygame.transform.scale(self._mini_map, (
+            App.get_screen_size()[0] - 40,
+            App.get_screen_size()[1] - 40
+        ))
 
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
         if not self.tiles:
@@ -107,12 +124,19 @@ class Map(object):
             # Rocks ###############################
             # self._rocks.draw(surface=surface, camera=camera)
 
-            # Oprimizer ###########################
-            self._optimizer.draw(surface=surface, camera=camera)
+            # Oprimizer ##########################
+            if self._optimizer:
+                self._optimizer.draw(surface=surface, camera=camera)
 
 
 # TODO : Optimizer n'est pas un sprite. C'est un objet non physique qui utilise une algo pour placer des objets.
-# TODO :De ce fait elle ne doit pas etendre de Game.Sprite mais tout simplement de object (class par defaut des objets python)
+# TODO : De ce fait elle ne doit pas etendre de Game.Sprite
+# TODO : mais tout simplement de object (class par defaut des objets python)
+# TODO : C'est la class Optimizer qui doit completement generer les rocks. Donc tout les tests de collisions et de
+# TODO : positionnement des rocks doivent etre faits dans Optimizer. Et ta classe Rock represente un seul rock.
+# TODO : Mais ils doivent utiliser la meme texture et pas en instancier une chacun. (Donc utilite du Registry)
+# TODO : Grace a l'integration des fonction de generation et de tests dans Optimizer,
+# TODO : tu pouras encore reduire les parcours je pense
 class Optimizer(Game.Sprite):
 
     def __init__(self, size):
@@ -134,28 +158,28 @@ class Optimizer(Game.Sprite):
         self._rects[0]["size"][0] = default_w
         self._rects[0]["size"][1] = default_h
 
-        self._items.append(Rock(20, x=(1, default_w), y=(1, default_w)))
+        self._items.append(Rock(10, x=(1, default_w), y=(1, default_w)))
 
         self._rects[1]["pos"][0] = default_w
         self._rects[1]["pos"][1] = 0
         self._rects[1]["size"][0] = default_w
         self._rects[1]["size"][1] = default_h
 
-        self._items.append(Rock(20, x=(default_w, default_w*2), y=(1, default_w)))
+        self._items.append(Rock(10, x=(default_w, default_w*2), y=(1, default_w)))
 
         self._rects[2]["pos"][0] = 0
         self._rects[2]["pos"][1] = default_h
         self._rects[2]["size"][0] = default_w
         self._rects[2]["size"][1] = default_h
 
-        self._items.append(Rock(20, x=(1, default_w), y=(default_w, default_w*2)))
+        self._items.append(Rock(10, x=(1, default_w), y=(default_w, default_w*2)))
 
         self._rects[3]["pos"][0] = default_w
         self._rects[3]["pos"][1] = default_h
         self._rects[3]["size"][0] = default_w
         self._rects[3]["size"][1] = default_h
 
-        self._items.append(Rock(20, x=(default_w, default_w*2), y=(default_w, default_w*2)))
+        self._items.append(Rock(10, x=(default_w, default_w*2), y=(default_w, default_w*2)))
 
         for item in self._items:
             item.generate()

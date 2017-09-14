@@ -4,19 +4,20 @@ import random
 import math
 
 
-# TODO: Rock est en effet un sprite. Cependant le fichier et donc la class devrais se trouver dans le dossier (module) Sprites, comme Player ;)
+# TODO: Rock est en effet un sprite. Cependant le fichier et donc la class devrait
+# TODO : se trouver dans le dossier (module) Sprites, comme Player ;)
 # TODO: Rock est bien un sprite. Cependant il doit reprenster, comme son nom l'indique, une rock, pas toute les rock
-# TODO: C'est ta class generate qui doit generer les differentes instances de Rock et retourner un tableaux de ceux-ci a la map pour qu'elle les dessines
-# TODO: Je me doute que tu le sais et que tu n'a juste pas encore eu le temps de le faire, je le rappel juste ;)
+# TODO : C'est ta class generate qui doit generer les differentes instances de Rock et
+# TODO : retourner un tableaux de ceux-ci a la map pour qu'elle les dessines
 class Rock(Game.Sprite):
 
     def __init__(self, nb_items, min_range_between=300, x=(0, 3200), y=(0, 3200)):
         super().__init__()
 
         self.debug_rocks_shapes = False  # toggle K_r
-        self.debug_rocks_values = True  # pas de toggle
+        self.debug_rocks_values = False  # pas de toggle
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
-        self._rock_tileset.set_scale(0.6)
+        self._rock_tileset.set_scale(0.4)
         self._tile_range = (0, 7)
         self._min_range_between_rocks = min_range_between
         self._max_nb_rocks = nb_items

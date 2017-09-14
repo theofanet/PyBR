@@ -15,14 +15,12 @@ if __name__ == '__main__':
         mouse_visible=config.getboolean("window", "mouse_visible"),
         show_fps=config.getboolean("window", "show_fps"),
         fps=config.getint("window", "fps"),
-        fullscreen=config.getboolean("window", "fullscreen")
+        fullscreen=config.getboolean("window", "fullscreen"),
+        title=config.get("window", "title")
     )
 
     # Loading scenes
-    App.load_scene("main", Scenes.FirstScene())
-    App.load_scene("menu", Scenes.Menu())
-    App.load_scene("settings", Scenes.Settings())
-    App.load_scene("net", Scenes.NetworkScene())
+    # App.load_scene("net", Scenes.NetworkScene())
     App.load_scene("first", Scenes.FirstScene())
     App.set_active_scene("first")
 

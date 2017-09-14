@@ -1,10 +1,8 @@
-import pygame
 import sys
 import atexit
 
 from .IO import *
 import PyGnin.Gui as Gui
-from PyGnin.Gui.locals import *
 
 
 class App(object):
@@ -39,6 +37,7 @@ class App(object):
         App._showFps = show_fps
         Debug.init(font_size=16)
         App._gui_screen = Gui.surface.Screen(size, flags, display=App._window)
+        App._font = pygame.font.SysFont("arial", 26)
         atexit.register(App.exit)
 
     @staticmethod
@@ -94,6 +93,22 @@ class App(object):
     @staticmethod
     def show_fps(show=True):
         App._showFps = show
+
+    @staticmethod
+    def get_background_color():
+        return App._backgroundColor
+
+    @staticmethod
+    def draw_loading(message="Loading ...", font=None, pos=None, col=(255, 255, 255), back=(0, 0, 0)):
+        if not pos:
+            pos = (20, App._screenSize[1] - 50)
+        App._window.fill(back)
+        if not font:
+            txt = App._font.render(message, True, col)
+            App._window.blit(txt, pos)
+        else:
+            font.draw_text(message, pos, col, App._window)
+        pygame.display.update()
 
     @staticmethod
     def run():
