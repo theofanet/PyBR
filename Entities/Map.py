@@ -20,8 +20,8 @@ class Map(object):
         self._size = (width * 16, height * 16)
 
         # Rocks ###############################
-        self._rocks = Rock()
-        self._optimizer = Optimizer(self._size, self._rocks)
+        # self._rocks = Rock(40)
+        self._optimizer = Optimizer(self._size)
         # #####################################
 
         self.generate(seed, frequency, water_lvl)
@@ -62,8 +62,8 @@ class Map(object):
                 self.tiles[y][x] = self.get_surface(e, water_lvl)
 
         # Rocks ###############################
-        # self.optimizer.split()
-        self._rocks.generate()
+        self._optimizer.generate()
+        # self._rocks.generate()
         # #####################################
 
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
@@ -105,23 +105,24 @@ class Map(object):
                             self._tileSet.draw_tile(col, row, rect.x, rect.y, screen=surface)
 
             # Rocks ###############################
-            self._rocks.draw(surface=surface, camera=camera)
+            # self._rocks.draw(surface=surface, camera=camera)
 
+            # Oprimizer ###########################
             self._optimizer.draw(surface=surface, camera=camera)
 
 
 class Optimizer(Game.Sprite):
 
-    def __init__(self, size, items):
+    def __init__(self, size):
         super(Optimizer, self).__init__()
         self._surface = App.get_display()
         self._size = size
         self._rects = [{"pos": [0, 0], "size": [0, 0]} for x in range(4)]
-        self._items = items
 
-        self.split()
+        self._items = list()
+        self.generate()
 
-    def split(self):
+    def generate(self):
 
         default_w = int(self._size[0] / 2)
         default_h = int(self._size[1] / 2)
@@ -131,22 +132,36 @@ class Optimizer(Game.Sprite):
         self._rects[0]["size"][0] = default_w
         self._rects[0]["size"][1] = default_h
 
+        self._items.append(Rock(20, x=(1, default_w), y=(1, default_w)))
+
         self._rects[1]["pos"][0] = default_w
         self._rects[1]["pos"][1] = 0
         self._rects[1]["size"][0] = default_w
         self._rects[1]["size"][1] = default_h
+
+        self._items.append(Rock(20, x=(default_w, default_w*2), y=(1, default_w)))
 
         self._rects[2]["pos"][0] = 0
         self._rects[2]["pos"][1] = default_h
         self._rects[2]["size"][0] = default_w
         self._rects[2]["size"][1] = default_h
 
+        self._items.append(Rock(20, x=(1, default_w), y=(default_w, default_w*2)))
+
         self._rects[3]["pos"][0] = default_w
         self._rects[3]["pos"][1] = default_h
         self._rects[3]["size"][0] = default_w
         self._rects[3]["size"][1] = default_h
 
+        self._items.append(Rock(20, x=(default_w, default_w*2), y=(default_w, default_w*2)))
+
+        for item in self._items:
+            item.generate()
+
     def draw(self, surface, camera=None):
+
+        for item in self._items:
+            item.draw(surface=surface, camera=camera)
 
         for rect in self._rects:
 
@@ -156,5 +171,6 @@ class Optimizer(Game.Sprite):
             if camera:
                 pos_x -= camera.get_position()[0]
                 pos_y -= camera.get_position()[1]
+
             pygame.draw.rect(surface, (255, 0, 0),
                              (pos_x, pos_y, rect["size"][0], rect["size"][1]), 2)

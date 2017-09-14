@@ -6,7 +6,7 @@ import math
 
 class Rock(Game.Sprite):
 
-    def __init__(self):
+    def __init__(self, nb_items, min_range_between=300, x=(0, 3200), y=(0, 3200)):
         super().__init__()
 
         self.debug_rocks_shapes = False  # toggle K_r
@@ -14,8 +14,10 @@ class Rock(Game.Sprite):
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
-        self._range_between_rocks = (100, 3000)
-        self._max_nb_rocks = 60
+        self._min_range_between_rocks = min_range_between
+        self._max_nb_rocks = nb_items
+        self._x_rect_size = x
+        self._y_rect_size = y
         self._rocks = [{"tile": [0, 0], "pos": [0, 0]} for x in range(self._max_nb_rocks)]
 
     @staticmethod
@@ -40,7 +42,8 @@ class Rock(Game.Sprite):
 
                 if not current_pos:
 
-                    current_pos = (random.randint(0, 3200), random.randint(0, 3200))  # voir pour le self.get_size
+                    current_pos = (random.randint(self._x_rect_size[0], self._x_rect_size[1]),
+                                   random.randint(self._y_rect_size[0], self._y_rect_size[1]))
                     # LOG ##############################
                     if self.debug_rocks_values:
                         print("current" + repr(current_pos))
@@ -56,12 +59,13 @@ class Rock(Game.Sprite):
                                 print("current:" + repr(current_pos) + " used:" + repr(pos) + " dist:" + repr(int(dist)))
                             # ###############################################################################
 
-                            if dist not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                            # if dist not in range(self._range_between_rocks[0], self._range_between_rocks[1]):
+                            if dist < self._min_range_between_rocks:
                                 # LOG #########################################################
                                 if self.debug_rocks_values:
                                     print("bad_range = " + repr(dist)
-                                          + " !(" + repr(self._range_between_rocks[0])
-                                          + " <> " + repr(self._range_between_rocks[1]) + ")")
+                                          + " !(" + repr(self._min_range_between_rocks)
+                                          + " <> " + repr(self._min_range_between_rocks) + ")")
                                 # #############################################################
                                 current_pos = list()
                                 break
