@@ -111,6 +111,8 @@ class Map(object):
             self._optimizer.draw(surface=surface, camera=camera)
 
 
+# TODO : Optimizer n'est pas un sprite. C'est un objet non physique qui utilise une algo pour placer des objets.
+# TODO :De ce fait elle ne doit pas etendre de Game.Sprite mais tout simplement de object (class par defaut des objets python)
 class Optimizer(Game.Sprite):
 
     def __init__(self, size):

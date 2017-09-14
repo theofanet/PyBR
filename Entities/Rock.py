@@ -4,6 +4,10 @@ import random
 import math
 
 
+# TODO: Rock est en effet un sprite. Cependant le fichier et donc la class devrais se trouver dans le dossier (module) Sprites, comme Player ;)
+# TODO: Rock est bien un sprite. Cependant il doit reprenster, comme son nom l'indique, une rock, pas toute les rock
+# TODO: C'est ta class generate qui doit generer les differentes instances de Rock et retourner un tableaux de ceux-ci a la map pour qu'elle les dessines
+# TODO: Je me doute que tu le sais et que tu n'a juste pas encore eu le temps de le faire, je le rappel juste ;)
 class Rock(Game.Sprite):
 
     def __init__(self, nb_items, min_range_between=300, x=(0, 3200), y=(0, 3200)):
@@ -119,7 +123,7 @@ class Rock(Game.Sprite):
                 c = (pos_x + tile_w, pos_y + tile_h)
                 pygame.draw.circle(surface, (255, 0, 0),
                                    (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)),
-                                   self._range_between_rocks[0], 2)
+                                   self._range_between_rocks[0], 2) # TODO : Bug car self ne contient pas de _range_between_rocks
                 pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, tile_w, tile_h), 2)
             # ####################
 
