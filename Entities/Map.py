@@ -20,8 +20,8 @@ class Map(object):
         self._size = (width * 16, height * 16)
 
         # Rocks ###############################
-        self.optimizer = Optimizer(self._size)
         self._rocks = Rock()
+        self._optimizer = Optimizer(self._size, self._rocks)
         # #####################################
 
         self.generate(seed, frequency, water_lvl)
@@ -107,18 +107,19 @@ class Map(object):
             # Rocks ###############################
             self._rocks.draw(surface=surface, camera=camera)
 
-            splits = self.optimizer.split()
-
-            for split in splits:
-                pygame.draw.rect(surface, (255, 0, 0), (split["pos"][0], split["pos"][1], split["size"][0], split["size"][1]), 2)
+            self._optimizer.draw(surface=surface, camera=camera)
 
 
-class Optimizer:
+class Optimizer(Game.Sprite):
 
-    def __init__(self, size):
+    def __init__(self, size, items):
+        super(Optimizer, self).__init__()
         self._surface = App.get_display()
         self._size = size
         self._rects = [{"pos": [0, 0], "size": [0, 0]} for x in range(4)]
+        self._items = items
+
+        self.split()
 
     def split(self):
 
@@ -145,4 +146,15 @@ class Optimizer:
         self._rects[3]["size"][0] = default_w
         self._rects[3]["size"][1] = default_h
 
-        return self._rects
+    def draw(self, surface, camera=None):
+
+        for rect in self._rects:
+
+            pos_x = rect["pos"][0]
+            pos_y = rect["pos"][1]
+
+            if camera:
+                pos_x -= camera.get_position()[0]
+                pos_y -= camera.get_position()[1]
+            pygame.draw.rect(surface, (255, 0, 0),
+                             (pos_x, pos_y, rect["size"][0], rect["size"][1]), 2)
