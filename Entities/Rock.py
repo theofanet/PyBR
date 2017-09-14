@@ -9,8 +9,8 @@ class Rock(Game.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.debug_rocks_shapes = False
-        self.debug_rocks_values = True
+        self.debug_rocks_shapes = False  # toggle K_r
+        self.debug_rocks_values = True  # pas de toggle
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
         self._rock_tileset.set_scale(0.6)
         self._tile_range = (0, 7)
