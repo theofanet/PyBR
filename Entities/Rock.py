@@ -46,9 +46,9 @@ class Rock(Game.Sprite):
                 current_pos = list()
 
                 if not current_pos:
-
                     current_pos = (random.randint(self._x_rect_size[0], self._x_rect_size[1]),
                                    random.randint(self._y_rect_size[0], self._y_rect_size[1]))
+
                     # LOG ##############################
                     if self.debug_rocks_values:
                         print("current" + repr(current_pos))
@@ -125,7 +125,7 @@ class Rock(Game.Sprite):
                 pygame.draw.circle(surface, (255, 0, 0),
                                    (int((a[0] + c[0]) / 2), int((a[1] + c[1]) / 2)),
                                    self._range_between_rocks[0], 2) # TODO : Bug car self ne contient pas de _range_between_rocks
-                pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, tile_w, tile_h), 2)
             # ####################
 
             self._rock_tileset.draw_tile(tile_x, tile_y, pos_x, pos_y, screen=surface)
+            pygame.draw.rect(surface, (0, 0, 0), (pos_x, pos_y, tile_w, tile_h), 2)

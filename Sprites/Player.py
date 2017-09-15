@@ -27,6 +27,7 @@ class Player(Game.AnimatedSprite):
         self.set_aim_color(list(map(int, self._config.get("aim", "color").split(","))))
         self._bullets = []
         self._active = active
+        self.bbox = pygame.Rect(6, 5, 34, 39)
 
     def set_aim_color(self, col):
         self._aims.set_color(col)
@@ -80,6 +81,8 @@ class Player(Game.AnimatedSprite):
             y = self._play_size[1] - self._frameRect.height
 
         self.set_position(x, y)
+        self.bbox.x = x + 6
+        self.bbox.y = y + 5
 
         self._aimPosition = IO.Mouse.position()
         aim_vector = Game.Vector(self._aimPosition[0] + x_cam - x, self._aimPosition[1] + y_cam - y)
@@ -99,7 +102,6 @@ class Player(Game.AnimatedSprite):
             self.set_animation("run-up")
         elif 225 < aim_angle < 315:
             self.set_animation("run-left")
-        #IO.Mouse.set_position(self._aimPosition)
 
         for bullet in self._bullets:
             bullet.update(*args)
@@ -108,6 +110,9 @@ class Player(Game.AnimatedSprite):
             self.shoot()
 
         super().update(*args)
+
+    def get_bbox(self):
+        return self.bbox
 
     def draw(self, surface, camera=None):
         x, y = self.get_position()
@@ -131,6 +136,9 @@ class Player(Game.AnimatedSprite):
             if bullet.is_destroy():
                 del self._bullets[i]
             i += 1
+
+        x, y, w, h = self.bbox
+        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(x - x_cam, y - y_cam, w, h), 1)
 
         super().draw(surface, camera)
 

@@ -22,6 +22,7 @@ class Map(object):
             "grass": (1, 0)
         }
         self._size = (width * 16, height * 16)
+        self._water_rects = []
 
         # Rocks ###############################
         # self._rocks = Rock(40)
@@ -58,12 +59,27 @@ class Map(object):
 
         done = 0
         to_do = self.width*self.height
+        water_w, water_h = (0, 0)
+        water_x, water_y = (0, 0)
+        is_water = False
+        self._water_rects = []
         for y in range(self.height):
             for x in range(self.width):
                 nx = x / self.width - 0.5
                 ny = y / self.height - 0.5
                 e = generator.noise2d(frequency * nx, frequency * ny) / 2.0 + 0.5
                 self.tiles[y][x] = self.get_surface(e, water_lvl)
+                if self.tiles[y][x] == self._surfaces["water"]:
+                    water_w += 16
+                    if not is_water:
+                        water_x = x * 16
+                        water_y = y * 16
+                        water_h += 16
+                    is_water = True
+                elif is_water:
+                    self._water_rects.append(pygame.Rect(water_x, water_y, water_w, water_h))
+                    water_w, water_h = (0, 0)
+                    is_water = False
                 done += 1
                 #App.draw_loading("Generating tiles ({0}/{1}) ...".format(done, to_do))
 
@@ -128,6 +144,36 @@ class Map(object):
             if self._optimizer:
                 self._optimizer.draw(surface=surface, camera=camera)
 
+            x, y = player_position
+            x_cam, y_cam = (0, 0)
+            if camera:
+                x_cam, y_cam = camera.get_position()
+            x = 16 * math.floor((x+16/2)/16)
+            y = 16 * math.floor((y+16/2)/16)
+            check_tiles = [
+                (x, y),
+                (x-16, y),
+                (x+16, y),
+                (x+32, y),
+                (x+48, y),
+                (x, y+16),
+                (x-16, y+16),
+                (x+16, y+16),
+                (x+32, y+16),
+                (x+48, y+16),
+                (x, y+32),
+                (x-16, y+32),
+                (x+16, y+32),
+                (x+32, y+32),
+                (x+48, y+32)
+            ]
+            for (x_tile, y_tile) in check_tiles:
+                col = (0, 255, 0)
+                print(x_tile, y_tile)
+                if self.tiles[int(y_tile/16)][int(x_tile/16)] == self._surfaces["water"]:
+                    col = (255, 0, 0)
+                pygame.draw.rect(surface, col, pygame.Rect(x_tile - x_cam, y_tile - y_cam, 16, 16))
+
 
 # TODO : Optimizer n'est pas un sprite. C'est un objet non physique qui utilise une algo pour placer des objets.
 # TODO : De ce fait elle ne doit pas etendre de Game.Sprite
@@ -149,7 +195,6 @@ class Optimizer(Game.Sprite):
         self.generate()
 
     def generate(self):
-
         default_w = int(self._size[0] / 2)
         default_h = int(self._size[1] / 2)
 
@@ -185,7 +230,6 @@ class Optimizer(Game.Sprite):
             item.generate()
 
     def draw(self, surface, camera=None):
-
         for item in self._items:
             item.draw(surface=surface, camera=camera)
 
