@@ -39,8 +39,11 @@ class FirstScene(Game.Scene):
                 self._is_menu_shown = True
 
             if not self._showMap:
+                x, y = self._player.get_position()
                 super().update()
                 self._camera.update(self._player.get_position(), self._player.get_direction(), self._map.get_size())
+                if self._map.check_water_collision(self._player):
+                    self._player.set_position(x, y)
         else:
             self._menu_subScene.update()
 

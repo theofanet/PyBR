@@ -144,12 +144,11 @@ class Map(object):
             if self._optimizer:
                 self._optimizer.draw(surface=surface, camera=camera)
 
-            x, y = player_position
-            x_cam, y_cam = (0, 0)
-            if camera:
-                x_cam, y_cam = camera.get_position()
+    def check_water_collision(self, player):
+            x, y = player.get_position()
             x = 16 * math.floor((x+16/2)/16)
             y = 16 * math.floor((y+16/2)/16)
+
             check_tiles = [
                 (x, y),
                 (x-16, y),
@@ -167,12 +166,13 @@ class Map(object):
                 (x+32, y+32),
                 (x+48, y+32)
             ]
+
+            player_bbox = player.get_bbox()
             for (x_tile, y_tile) in check_tiles:
-                col = (0, 255, 0)
-                print(x_tile, y_tile)
-                if self.tiles[int(y_tile/16)][int(x_tile/16)] == self._surfaces["water"]:
-                    col = (255, 0, 0)
-                pygame.draw.rect(surface, col, pygame.Rect(x_tile - x_cam, y_tile - y_cam, 16, 16))
+                if y_tile/16 < self.height and x_tile/16 < self.width:
+                    if self.tiles[int(y_tile/16)][int(x_tile/16)] == self._surfaces["water"] \
+                            and player_bbox.colliderect(pygame.Rect(x_tile, y_tile, 16, 16)):
+                        return True
 
 
 # TODO : Optimizer n'est pas un sprite. C'est un objet non physique qui utilise une algo pour placer des objets.
