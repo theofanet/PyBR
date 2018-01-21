@@ -15,6 +15,7 @@ class NetPkgHandler(Network.PkgHandler):
                     self._scene.waitingPlayersData = False
                 elif pkg["type"] == "player_update" and "token" in pkg and "data" in pkg:
                     self._scene.game_subScene.update_player(pkg["token"], pkg["data"])
+                    self._scene.waitingPlayersData = False
             else:
                 if pkg["type"] == "users_list" and "list" in pkg:
                     i = nb = 0
@@ -108,6 +109,7 @@ class NetworkScene(Game.Scene):
         self._client = Network.Client(pkg_handler=NetPkgHandler(scene=self))
         self._client.after_close = self.on_client_close
 
+        self.is_server = False
         self.connexion_menu = Scenes.Sub.ConnexionMenu()
         self.game_subScene = Scenes.Sub.GameSubScene()
 
@@ -158,6 +160,7 @@ class NetworkScene(Game.Scene):
             self._server.start(self.connexion_menu.serverIpInput.text, int(self.connexion_menu.serverPortInput.text))
             self._server.run()
             self.connexion_menu.toggle_server(True)
+            self.is_server = True
         else:
             self._server.close()
             self.connexion_menu.toggle_server(False)
@@ -185,7 +188,8 @@ class NetworkScene(Game.Scene):
         self._client.send_pkg({"action": "set_ready"})
 
     def lunch_game(self):
-        self.connexion_menu.close()
-        self.game_subScene.initiate(self)
-        self.game_subScene.activate()
-        self.active_subScene = self.game_subScene
+        if not self.is_server:
+            self.connexion_menu.close()
+            self.game_subScene.initiate(self)
+            self.game_subScene.activate()
+            self.active_subScene = self.game_subScene

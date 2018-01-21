@@ -19,6 +19,7 @@ class Map(object):
         self.trees = None
         self._tileSet = Render.TileSet("assets/island.png")
         self._treeTexture = Render.Image("assets/tree.png")
+        self._rockTexture = Rock(1)
         self._surfaces = {
             "water": (0, 0),
             "dirt": (4, 2),
@@ -95,6 +96,12 @@ class Map(object):
             for x in range(self.width):
                 if self.tiles_type[y][x] == "grass":
                     self.tiles[y][x] = self.get_tile_coords("grass", x, y)
+                t = 1
+                if self.tiles_type[y][x] == "dirt":
+                    t = 2
+                r = random.random()
+                if r > 0.998:
+                    self.trees[y][x] = t
 
         # Rocks ###############################
         if self._optimizer:
@@ -164,11 +171,6 @@ class Map(object):
         if not AB and not BC and not CD and AD:
             return self._surfaces[tile_type][0] + 4, self._surfaces[tile_type][1] + 1
 
-        if tile_type == "grass":
-            r = random.random()
-            if r > 0.998:
-                self.trees[y][x] = 1
-
         return self._surfaces[tile_type][0] + 1, self._surfaces[tile_type][1] + 1
 
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
@@ -218,9 +220,12 @@ class Map(object):
                             if camera:
                                 rect.x -= camera.get_position()[0]
                                 rect.y -= camera.get_position()[1]
-                            rect.x -= g_rect.width / 2
-                            rect.y -= g_rect.height
-                            self._treeTexture.draw(rect.x, rect.y, display=surface)
+                            if self.trees[y][x] == 1:
+                                rect.x -= g_rect.width / 2
+                                rect.y -= g_rect.height
+                                self._treeTexture.draw(rect.x, rect.y, display=surface)
+                            elif self.trees[y][x] == 2:
+                                self._rockTexture.draw_rock(rect.x, rect.y, surface=surface)
 
             # Rocks ###############################
             # self._rocks.draw(surface=surface, camera=camera)

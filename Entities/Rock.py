@@ -13,7 +13,6 @@ class Rock(Game.Sprite):
 
     def __init__(self, nb_items, min_range_between=300, x=(0, 3200), y=(0, 3200)):
         super().__init__()
-
         self.debug_rocks_shapes = False  # toggle K_r
         self.debug_rocks_values = False  # pas de toggle
         self._rock_tileset = Render.TileSet("assets/rocks_rotated.png", (256, 256))
@@ -27,11 +26,9 @@ class Rock(Game.Sprite):
 
     @staticmethod
     def calc_dist(p1, p2):
-
         return math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2)
 
     def generate(self):
-
         used_pos = []
         for rock in self._rocks:
 
@@ -96,6 +93,9 @@ class Rock(Game.Sprite):
         if self.debug_rocks_values:
             print(self._rocks)
         # ################
+
+    def draw_rock(self, x, y, surface=None):
+        self._rock_tileset.draw_tile(0, 0, x, y, screen=surface)
 
     def draw(self, surface, camera=None):
 
