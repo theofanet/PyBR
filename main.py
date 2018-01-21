@@ -20,7 +20,7 @@ if __name__ == '__main__':
     )
 
     # Loading scenes
-    # App.load_scene("net", Scenes.NetworkScene())
+    App.load_scene("net", Scenes.NetworkScene())
     App.load_scene("first", Scenes.FirstScene())
     App.set_active_scene("first")
 

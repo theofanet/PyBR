@@ -3,6 +3,7 @@ from opensimplex import OpenSimplex
 from Entities.Rock import *
 import pygame
 import math
+import random
 
 
 class Map(object):
@@ -14,12 +15,15 @@ class Map(object):
         self.width = width
         self.height = height
         self.tiles = None
-        self._tileSet = Render.TileSet("assets/tileset.png")
+        self.tiles_type = None
+        self.trees = None
+        self._tileSet = Render.TileSet("assets/island.png")
+        self._treeTexture = Render.Image("assets/tree.png")
         self._surfaces = {
             "water": (0, 0),
-            "dirt": (2, 0),
+            "dirt": (4, 2),
             "rock": (2, 0),
-            "grass": (1, 0)
+            "grass": (5, 0)
         }
         self._size = (width * 16, height * 16)
         self._water_rects = []
@@ -39,13 +43,13 @@ class Map(object):
 
     def get_surface(self, e, water=0.1):
         if e < water:
-            return self._surfaces["water"]
+            return self._surfaces["grass"], "grass"
         elif e < water + 0.3:
-            return self._surfaces["grass"]
+            return self._surfaces["grass"], "grass"
         elif e < water + 0.5:
-            return self._surfaces["dirt"]
+            return self._surfaces["dirt"], "dirt"
         else:
-            return self._surfaces["rock"]
+            return self._surfaces["dirt"], "dirt"
 
     @staticmethod
     def noise(nx, ny, generator):
@@ -55,6 +59,8 @@ class Map(object):
         generator = OpenSimplex(seed=seed)
 
         self.tiles = [[0 for x in range(self.width)] for y in range(self.height)]
+        self.trees = [[0 for x in range(self.width)] for y in range(self.height)]
+        self.tiles_type = [["dirt" for x in range(self.width)] for y in range(self.height)]
         App.draw_loading("Generating map : tiles ...", self._font)
 
         done = 0
@@ -68,7 +74,9 @@ class Map(object):
                 nx = x / self.width - 0.5
                 ny = y / self.height - 0.5
                 e = generator.noise2d(frequency * nx, frequency * ny) / 2.0 + 0.5
-                self.tiles[y][x] = self.get_surface(e, water_lvl)
+                d = self.get_surface(e, water_lvl)
+                self.tiles[y][x] = d[0]
+                self.tiles_type[y][x] = d[1]
                 if self.tiles[y][x] == self._surfaces["water"]:
                     water_w += 16
                     if not is_water:
@@ -82,6 +90,11 @@ class Map(object):
                     is_water = False
                 done += 1
                 #App.draw_loading("Generating tiles ({0}/{1}) ...".format(done, to_do))
+
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.tiles_type[y][x] == "grass":
+                    self.tiles[y][x] = self.get_tile_coords("grass", x, y)
 
         # Rocks ###############################
         if self._optimizer:
@@ -98,6 +111,65 @@ class Map(object):
             App.get_screen_size()[0] - 40,
             App.get_screen_size()[1] - 40
         ))
+
+    def get_tile_coords(self, tile_type, x, y):
+        A = False
+        B = False
+        C = False
+        D = False
+        AB = False
+        BC = False
+        CD = False
+        AD = False
+
+        if y > 0 and self.tiles_type[y - 1][x] != tile_type:
+            A = True
+        if x < self.width - 1 and self.tiles_type[y][x + 1] != tile_type:
+            B = True
+        if y < self.height - 1 and self.tiles_type[y + 1][x] != tile_type:
+            C = True
+        if x > 0 and self.tiles_type[y][x - 1] != tile_type:
+            D = True
+        if y > 0 and x < self.width - 1 and self.tiles_type[y - 1][x + 1] != tile_type:
+            AB = True
+        if y < self.height - 1 and x < self.width - 1 and self.tiles_type[y + 1][x + 1] != tile_type:
+            BC = True
+        if y < self.height - 1 and x > 0 and self.tiles_type[y + 1][x - 1] != tile_type:
+            CD = True
+        if y > 0 and x > 0 and self.tiles_type[y - 1][x - 1] != tile_type:
+            AD = True
+
+        if A and not B and not C and not D:
+            return self._surfaces[tile_type][0] + 1, self._surfaces[tile_type][1]
+        if B and not A and not C and not D:
+            return self._surfaces[tile_type][0] + 2, self._surfaces[tile_type][1] + 1
+        if C and not A and not B and not D:
+            return self._surfaces[tile_type][0] + 1, self._surfaces[tile_type][1] + 2
+        if D and not A and not B and not C:
+            return self._surfaces[tile_type][0], self._surfaces[tile_type][1] + 1
+        if A and B and not C and not D:
+            return self._surfaces[tile_type][0] + 2, self._surfaces[tile_type][1]
+        if A and not B and not C and D:
+            return self._surfaces[tile_type][0], self._surfaces[tile_type][1]
+        if B and not A and C and not D:
+            return self._surfaces[tile_type][0] + 2, self._surfaces[tile_type][1] + 2
+        if C and not A and not B and D:
+            return self._surfaces[tile_type][0], self._surfaces[tile_type][1] + 2
+        if AB and not BC and not CD and not AD:
+            return self._surfaces[tile_type][0] + 3, self._surfaces[tile_type][1] + 1
+        if not AB and BC and not CD and not AD:
+            return self._surfaces[tile_type][0] + 3, self._surfaces[tile_type][1]
+        if not AB and not BC and CD and not AD:
+            return self._surfaces[tile_type][0] + 4, self._surfaces[tile_type][1]
+        if not AB and not BC and not CD and AD:
+            return self._surfaces[tile_type][0] + 4, self._surfaces[tile_type][1] + 1
+
+        if tile_type == "grass":
+            r = random.random()
+            if r > 0.998:
+                self.trees[y][x] = 1
+
+        return self._surfaces[tile_type][0] + 1, self._surfaces[tile_type][1] + 1
 
     def draw(self, camera=None, surface=None, mini_map=False, player_position=(0, 0)):
         if not self.tiles:
@@ -137,12 +209,25 @@ class Map(object):
                             col, row = self.tiles[y][x]
                             self._tileSet.draw_tile(col, row, rect.x, rect.y, screen=surface)
 
+            g_rect = self._treeTexture.get_img().get_rect()
+            for y in range(y_start, y_end):
+                if 0 <= y < len(self.tiles):
+                    for x in range(x_start, x_end):
+                        if 0 <= x < len(self.tiles[y]) and self.trees[y][x]:
+                            rect = pygame.Rect(16 * x, 16 * y, 16, 16)
+                            if camera:
+                                rect.x -= camera.get_position()[0]
+                                rect.y -= camera.get_position()[1]
+                            rect.x -= g_rect.width / 2
+                            rect.y -= g_rect.height
+                            self._treeTexture.draw(rect.x, rect.y, display=surface)
+
             # Rocks ###############################
             # self._rocks.draw(surface=surface, camera=camera)
 
             # Oprimizer ##########################
-            if self._optimizer:
-                self._optimizer.draw(surface=surface, camera=camera)
+            #if self._optimizer:
+            #    self._optimizer.draw(surface=surface, camera=camera)
 
     def check_water_collision(self, player):
             x, y = player.get_position()
