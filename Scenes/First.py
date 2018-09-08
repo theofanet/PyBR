@@ -11,12 +11,7 @@ class FirstScene(Game.Scene):
         super().__init__()
         self._showMap = False
         self._font = Font("assets/Permanent_Marker/PermanentMarker-Regular.ttf")
-        self._map = Map(
-            200, 200,
-            int(time.time()),
-            Registry.registered("config").getfloat("map", "frequency"),
-            Registry.registered("config").getfloat("map", "water_level")
-        )
+        self._map = Map(200, 200)
         self._player = Sprites.Player()
         self.add_sprites(self._player)
         self._player.set_play_size(self._map.get_size())
@@ -26,6 +21,11 @@ class FirstScene(Game.Scene):
 
     def _load_resources(self):
         App.show_cursor(False)
+        self._map.generate(
+            int(time.time()),
+            Registry.registered("config").getfloat("map", "frequency"),
+            Registry.registered("config").getfloat("map", "water_level")
+        )
         self._player.set_aim_color(list(map(int, Registry.registered("config").get("aim", "color").split(","))))
         self._menu_subScene.initiate(self)
         self._menu_subScene.resumeButton.on_click = self.resume_game
@@ -42,7 +42,7 @@ class FirstScene(Game.Scene):
                 x, y = self._player.get_position()
                 super().update()
                 self._camera.update(self._player.get_position(), self._player.get_direction(), self._map.get_size())
-                if self._map.check_water_collision(self._player):
+                if self._map.check_water_collision(self._player, self._camera):
                     self._player.set_position(x, y)
         else:
             self._menu_subScene.update()
@@ -54,6 +54,7 @@ class FirstScene(Game.Scene):
             self._map.draw(camera=self._camera, mini_map=self._showMap, player_position=self._player.get_position())
             if not self._showMap:
                 super().draw_sprites(self._camera)
+                self._map.draw_foreground(camera=self._camera)
 
     def resume_game(self):
         self._menu_subScene.close()

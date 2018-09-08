@@ -9,3 +9,7 @@ class Registry(object):
     def registered(key):
         if key in Registry._objects:
             return Registry._objects[key]
+
+    @staticmethod
+    def has(key):
+        return key in Registry._objects

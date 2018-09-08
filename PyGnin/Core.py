@@ -126,8 +126,8 @@ class App(object):
 
             # Updating and drawing active scene
             if App._activeScene:
-                App._scenes[App._activeScene].update()
                 App._scenes[App._activeScene].draw()
+                App._scenes[App._activeScene].update()
 
             Debug.draw(App._window)
 

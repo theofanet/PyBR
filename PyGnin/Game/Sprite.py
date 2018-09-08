@@ -1,5 +1,6 @@
 import pygame
 from ..Render.Image import Image
+from ..Registry import Registry
 
 
 class Sprite(pygame.sprite.Sprite):
@@ -13,7 +14,10 @@ class Sprite(pygame.sprite.Sprite):
         self.draw_size = None
 
     def load_image(self, path):
-        self._image = Image(path)
+        key = "img::" + path
+        if not Registry.has(key):
+            Registry.register(key, Image(path))
+        self._image = Registry.registered(key)
         self.image = self._image.get_img()
         self.rect = self.image.get_rect()
 
@@ -25,6 +29,9 @@ class Sprite(pygame.sprite.Sprite):
 
     def get_position(self):
         return self.rect.x, self.rect.y
+
+    def get_bbox(self):
+        return self.rect
 
     def set_area(self, x=0, y=0, w=0, h=0):
         if not self.area:

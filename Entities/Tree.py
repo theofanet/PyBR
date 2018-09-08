@@ -2,12 +2,11 @@ from PyGnin import *
 import pygame
 
 
-class Rock(Game.Sprite):
+class Tree(Game.Sprite):
     def __init__(self):
         super().__init__()
-        self.load_image("assets/rock1.png")
-        self.set_scale(0.5)
-        self._bounding_box = pygame.Rect(self.rect.w/2 - 20, self.rect.h - 35, self.rect.w - 30, 30)
+        self.load_image("assets/tree.png")
+        self._bounding_box = pygame.Rect(self.rect.w/2 - 10, self.rect.h - 20, 20, 10)
 
     def draw(self, surface, camera=None):
         super().draw(surface, camera)
@@ -24,6 +23,7 @@ class Rock(Game.Sprite):
         return rect
 
     def check_collision(self, rect):
+        print("CHECK")
         if rect.colliderect(self.get_bbox()):
             return True
         return False

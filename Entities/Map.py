@@ -1,25 +1,23 @@
 from PyGnin import *
+from .Tree import Tree
+from .Rock import Rock
 from opensimplex import OpenSimplex
 from Entities.Rock import *
 import pygame
-import math
 import random
 
 
 class Map(object):
-    def __init__(self, width=0, height=0, seed=0, frequency=1.0, water_lvl=0.1):
+    def __init__(self, width=0, height=0):
         super().__init__()
         self._font = Render.Font("assets/Permanent_Marker/PermanentMarker-Regular.ttf")
-        App.draw_loading("Generating map ...", self._font)
-
         self.width = width
         self.height = height
         self.tiles = None
         self.tiles_type = None
         self.trees = None
         self._tileSet = Render.TileSet("assets/island.png")
-        self._treeTexture = Render.Image("assets/tree.png")
-        self._rockTexture = Rock(1)
+        #self._treeTexture = Render.Image("assets/tree.png")
         self._surfaces = {
             "water": (0, 0),
             "dirt": (4, 2),
@@ -29,15 +27,7 @@ class Map(object):
         self._size = (width * 16, height * 16)
         self._water_rects = []
 
-        # Rocks ###############################
-        # self._rocks = Rock(40)
-        self._optimizer = None
-        if Registry.registered("config").getboolean("map", "load_rocks"):
-            self._optimizer = Optimizer(self._size)
-        # #####################################
-
         self._mini_map = None
-        self.generate(seed, frequency, water_lvl)
 
     def get_size(self):
         return self._size
@@ -57,6 +47,7 @@ class Map(object):
         return generator.noise2d(nx, ny) / 2.0 + 0.5
 
     def generate(self, seed=0, frequency=1.0, water_lvl=0.1):
+        App.draw_loading("Generating map ...", self._font)
         generator = OpenSimplex(seed=seed)
 
         self.tiles = [[0 for x in range(self.width)] for y in range(self.height)]
@@ -65,7 +56,6 @@ class Map(object):
         App.draw_loading("Generating map : tiles ...", self._font)
 
         done = 0
-        to_do = self.width*self.height
         water_w, water_h = (0, 0)
         water_x, water_y = (0, 0)
         is_water = False
@@ -94,26 +84,22 @@ class Map(object):
 
         for y in range(self.height):
             for x in range(self.width):
-                if self.tiles_type[y][x] == "grass":
-                    self.tiles[y][x] = self.get_tile_coords("grass", x, y)
-                t = 1
-                if self.tiles_type[y][x] == "dirt":
-                    t = 2
                 r = random.random()
                 if r > 0.998:
-                    self.trees[y][x] = t
-
-        # Rocks ###############################
-        if self._optimizer:
-            App.draw_loading("Generating map : rocks ...", self._font)
-            self._optimizer.generate()
-        # self._rocks.generate()
-        # #####################################
+                    if self.tiles_type[y][x] == "dirt":
+                        rock = Rock()
+                        rock.set_position(16 * x, 16 * y)
+                        self.trees[y][x] = rock
+                    else:
+                        tree = Tree()
+                        tree.set_position((16 * x) - tree.rect.w / 2, (16 * y) - tree.rect.h)
+                        self.trees[y][x] = tree
 
         # Mini map generation
         App.draw_loading("Generating map : mini map ...", self._font)
         self._mini_map = pygame.Surface((16 * self.width, 16 * self.height))
         self.draw(camera=None, surface=self._mini_map)
+        self.draw_foreground(camera=None, surface=self._mini_map)
         self._mini_map = pygame.transform.scale(self._mini_map, (
             App.get_screen_size()[0] - 40,
             App.get_screen_size()[1] - 40
@@ -211,126 +197,57 @@ class Map(object):
                             col, row = self.tiles[y][x]
                             self._tileSet.draw_tile(col, row, rect.x, rect.y, screen=surface)
 
-            g_rect = self._treeTexture.get_img().get_rect()
+    def draw_foreground(self, camera=None, surface=None):
+            x_start = 0
+            x_end = self.width
+            y_start = 0
+            y_end = self.height
+
+            if not surface:
+                surface = App.get_display()
+
+            if camera:
+                view_offset = 10
+                x_start = int(camera.position[0] / 16) - view_offset
+                y_start = int(camera.position[1] / 16) - view_offset
+                x_end = x_start + int(camera.viewSize[0] / 16) + view_offset
+                y_end = y_start + int(camera.viewSize[1] / 16) + view_offset
+
+            #g_rect = self._treeTexture.get_img().get_rect()
             for y in range(y_start, y_end):
                 if 0 <= y < len(self.tiles):
                     for x in range(x_start, x_end):
-                        if 0 <= x < len(self.tiles[y]) and self.trees[y][x]:
+                        if 0 <= x < len(self.tiles[y]):
                             rect = pygame.Rect(16 * x, 16 * y, 16, 16)
                             if camera:
                                 rect.x -= camera.get_position()[0]
                                 rect.y -= camera.get_position()[1]
-                            if self.trees[y][x] == 1:
-                                rect.x -= g_rect.width / 2
-                                rect.y -= g_rect.height
-                                self._treeTexture.draw(rect.x, rect.y, display=surface)
-                            elif self.trees[y][x] == 2:
-                                self._rockTexture.draw_rock(rect.x, rect.y, surface=surface)
-
-            # Rocks ###############################
-            # self._rocks.draw(surface=surface, camera=camera)
-
-            # Oprimizer ##########################
-            #if self._optimizer:
-            #    self._optimizer.draw(surface=surface, camera=camera)
-
-    def check_water_collision(self, player):
-            x, y = player.get_position()
-            x = 16 * math.floor((x+16/2)/16)
-            y = 16 * math.floor((y+16/2)/16)
-
-            check_tiles = [
-                (x, y),
-                (x-16, y),
-                (x+16, y),
-                (x+32, y),
-                (x+48, y),
-                (x, y+16),
-                (x-16, y+16),
-                (x+16, y+16),
-                (x+32, y+16),
-                (x+48, y+16),
-                (x, y+32),
-                (x-16, y+32),
-                (x+16, y+32),
-                (x+32, y+32),
-                (x+48, y+32)
-            ]
-
-            player_bbox = player.get_bbox()
-            for (x_tile, y_tile) in check_tiles:
-                if y_tile/16 < self.height and x_tile/16 < self.width:
-                    if self.tiles[int(y_tile/16)][int(x_tile/16)] == self._surfaces["water"] \
-                            and player_bbox.colliderect(pygame.Rect(x_tile, y_tile, 16, 16)):
-                        return True
+                            #if self.trees[y][x] == 1:
+                                #rect.x -= g_rect.width / 2
+                                #rect.y -= g_rect.height
+                                #self._treeTexture.draw(rect.x, rect.y, display=surface)
+                            if self.trees[y][x]:
+                                self.trees[y][x].draw(camera=camera, surface=surface)
 
 
-# TODO : Optimizer n'est pas un sprite. C'est un objet non physique qui utilise une algo pour placer des objets.
-# TODO : De ce fait elle ne doit pas etendre de Game.Sprite
-# TODO : mais tout simplement de object (class par defaut des objets python)
-# TODO : C'est la class Optimizer qui doit completement generer les rocks. Donc tout les tests de collisions et de
-# TODO : positionnement des rocks doivent etre faits dans Optimizer. Et ta classe Rock represente un seul rock.
-# TODO : Mais ils doivent utiliser la meme texture et pas en instancier une chacun. (Donc utilite du Registry)
-# TODO : Grace a l'integration des fonction de generation et de tests dans Optimizer,
-# TODO : tu pouras encore reduire les parcours je pense
-class Optimizer(Game.Sprite):
-
-    def __init__(self, size):
-        super(Optimizer, self).__init__()
-        self._surface = App.get_display()
-        self._size = size
-        self._rects = [{"pos": [0, 0], "size": [0, 0]} for x in range(4)]
-
-        self._items = list()
-        self.generate()
-
-    def generate(self):
-        default_w = int(self._size[0] / 2)
-        default_h = int(self._size[1] / 2)
-
-        self._rects[0]["pos"][0] = 0
-        self._rects[0]["pos"][1] = 0
-        self._rects[0]["size"][0] = default_w
-        self._rects[0]["size"][1] = default_h
-
-        self._items.append(Rock(10, x=(1, default_w), y=(1, default_w)))
-
-        self._rects[1]["pos"][0] = default_w
-        self._rects[1]["pos"][1] = 0
-        self._rects[1]["size"][0] = default_w
-        self._rects[1]["size"][1] = default_h
-
-        self._items.append(Rock(10, x=(default_w, default_w*2), y=(1, default_w)))
-
-        self._rects[2]["pos"][0] = 0
-        self._rects[2]["pos"][1] = default_h
-        self._rects[2]["size"][0] = default_w
-        self._rects[2]["size"][1] = default_h
-
-        self._items.append(Rock(10, x=(1, default_w), y=(default_w, default_w*2)))
-
-        self._rects[3]["pos"][0] = default_w
-        self._rects[3]["pos"][1] = default_h
-        self._rects[3]["size"][0] = default_w
-        self._rects[3]["size"][1] = default_h
-
-        self._items.append(Rock(10, x=(default_w, default_w*2), y=(default_w, default_w*2)))
-
-        for item in self._items:
-            item.generate()
-
-    def draw(self, surface, camera=None):
-        for item in self._items:
-            item.draw(surface=surface, camera=camera)
-
-        for rect in self._rects:
-
-            pos_x = rect["pos"][0]
-            pos_y = rect["pos"][1]
+    def check_water_collision(self, player, camera=None):
+            x_start = 0
+            x_end = self.width
+            y_start = 0
+            y_end = self.height
 
             if camera:
-                pos_x -= camera.get_position()[0]
-                pos_y -= camera.get_position()[1]
+                view_offset = 10
+                x_start = int(camera.position[0] / 16) - view_offset
+                y_start = int(camera.position[1] / 16) - view_offset
+                x_end = x_start + int(camera.viewSize[0] / 16) + view_offset
+                y_end = y_start + int(camera.viewSize[1] / 16) + view_offset
 
-            pygame.draw.rect(surface, (255, 0, 0),
-                             (pos_x, pos_y, rect["size"][0], rect["size"][1]), 2)
+            player_bbox = player.get_bbox()
+            for y in range(y_start, y_end):
+                if 0 <= y < len(self.tiles):
+                    for x in range(x_start, x_end):
+                        if 0 <= x < len(self.tiles[y]):
+                            if self.trees[y][x] and self.trees[y][x] != 2:
+                                if self.trees[y][x].check_collision(player_bbox):
+                                    return True

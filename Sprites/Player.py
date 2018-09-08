@@ -99,7 +99,7 @@ class Player(Game.AnimatedSprite):
         aim_angle = aim_vector.angle()
         if aim_angle < 0:
             aim_angle = 360 + aim_angle
-        IO.Debug.log("Angle : {0}", aim_angle)
+        # IO.Debug.log("Angle : {0}", aim_angle)
         if 315 < aim_angle or aim_angle < 45:
             self.set_animation("run-down")
         elif 45 < aim_angle < 135:
@@ -143,13 +143,16 @@ class Player(Game.AnimatedSprite):
                 del self._bullets[i]
             i += 1
 
-        # x, y, w, h = self.bbox
-        # pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(x - x_cam, y - y_cam, w, h), 1)
+        #x, y, w, h = self.bbox
+        #pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(x - x_cam, y - y_cam, w, h), 1)
 
         super().draw(surface, camera)
 
     def set_play_size(self, size=(0, 0)):
         self._play_size = size
+
+    def get_bullets(self):
+        return self._bullets
 
     def get_direction(self):
         return self._direction

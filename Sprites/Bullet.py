@@ -7,8 +7,8 @@ class Bullet(Game.Sprite):
     def __init__(self, position=(0, 0), direction=(1, 1)):
         super().__init__()
         self.load_image("assets/bullet.png")
-        self._life_time = 300
-        self._speed = 50
+        self._life_time = 3000
+        self._speed = 10
         self._direction = Game.Vector(direction[0], direction[1])
         self._direction.normalize()
         self.set_position(position[0], position[1])
@@ -22,3 +22,6 @@ class Bullet(Game.Sprite):
 
     def is_destroy(self):
         return self._life_time < self._time
+
+    def destroy(self):
+        self._life_time = 0
