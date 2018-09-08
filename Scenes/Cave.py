@@ -10,7 +10,7 @@ LOOT_MODE = 1
 EXTRACT_MODE = 2
 GAME_OVER_MODE = 6
 
-LOOT_TIME = 180
+LOOT_TIME = 45
 EXTRACT_TIME = 30
 
 class CaveScene(Game.Scene):
@@ -35,15 +35,6 @@ class CaveScene(Game.Scene):
         App.show_cursor(True)
         self.current_step = 0
         self._map.init()
-
-    def get_time_humanized(self, rest):
-        conv = (31536000, 2592000, 86400, 3600, 60, 1)
-        result = [0, 0, 0, 0, 0, 0]
-        i = 0
-        while rest > 0:
-            result[i], rest = divmod(rest, conv[i])
-            i += 1
-        return result
 
     def update(self):
         if not self._init_done:
