@@ -2,3 +2,4 @@ pygame
 opensimplex
 ConfigParser
 pyopengl
+numpy

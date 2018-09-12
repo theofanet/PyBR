@@ -11,11 +11,12 @@ class Font(object):
         self._color = color
         return self
 
-    def draw_text(self, text, position=(0, 0), color=False, screen=False):
+    def draw_text(self, text, position=(0, 0), color=False, screen=False, update_display=False):
         if not screen:
             screen = App.get_display()
         if not color:
             color = self._color
-
         txt = self._font.render(text, True, color)
         screen.blit(txt, position)
+        if update_display:
+            pygame.display.update()

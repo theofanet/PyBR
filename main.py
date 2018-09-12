@@ -23,6 +23,7 @@ if __name__ == '__main__':
     App.load_scene("net", Scenes.NetworkScene())
     App.load_scene("first", Scenes.FirstScene())
     App.load_scene("cave", Scenes.CaveScene())
+    App.load_scene("astar", Scenes.AStarScene())
     App.set_active_scene("cave")
 
     App.run()

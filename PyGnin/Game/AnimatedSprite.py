@@ -4,43 +4,52 @@ from ..Core import App
 
 
 class Animation(object):
-    row = 0
-    startIndex = 0
-    nbFrame = 1
-    index = 0
-    frequency = 0
-    active = True
-    _elapsedTime = 0
-
-    def __init__(self, row=0, start_index=0, nb_frame=1, frequency=100):
+    def __init__(self, row=0, cell=0, nb_frame=1, frequency=100, vertical=False, one_time=False):
         super().__init__()
+        self._elapsedTime = 0
+        self.stopped = False
+        self.one_time = one_time
+        self.vertical = vertical
+        self.start_row = row
+        self.start_cell = cell
         self.row = row
-        self.startIndex = start_index
+        self.cell = cell
         self.nbFrame = nb_frame
         self.frequency = frequency
-        self.index = start_index
+        self.index = cell if not vertical else row
 
     def update(self):
         self._elapsedTime += App.get_clock().get_time()
-        if self._elapsedTime > self.frequency:
-            self.index += 1
-            self._elapsedTime -= self.frequency
-            if self.index > self.startIndex + (self.nbFrame - 1):
-                self.index = self.startIndex
+        if not self.stopped:
+            start_index = self.start_cell if not self.vertical else self.start_row
+            if self._elapsedTime > self.frequency:
+                self.index += 1
+                self._elapsedTime -= self.frequency
+                if self.index > start_index + (self.nbFrame - 1):
+                    if self.one_time:
+                        self.stopped = True
+                        self.index = start_index + (self.nbFrame - 1)
+                    else:
+                        self.index = start_index
+                if self.vertical:
+                    self.row = self.index
+                else:
+                    self.cell = self.index
 
     def reset(self):
-        self.index = self.startIndex
+        self.index = self.start_cell if not self.vertical else self.start_row
+        self._elapsedTime = 0
+        self.stopped = False
 
 
 class AnimatedSprite(Sprite):
-    _frameRect = None
-    _playing = False
-    _animations = {}
-    _animation = None
-
     def __init__(self):
         super().__init__()
         self._index = 1
+        self._frameRect = None
+        self._playing = False
+        self._animations = {}
+        self._animation = None
         if self.image:
             self._frameRect = self.image.get_rect()
 
@@ -55,12 +64,15 @@ class AnimatedSprite(Sprite):
     def draw(self, surface, camera=None):
         if self._animation:
             self.set_area(
-                self._frameRect.width * self._animation.index,
+                self._frameRect.width * self._animation.cell,
                 self._frameRect.height * self._animation.row,
                 self._frameRect.width,
                 self._frameRect.height
             )
         super().draw(surface, camera)
+
+    def get_frame_rect(self):
+        return self._frameRect
 
     def update(self, *args):
         if self._animation and self._playing:

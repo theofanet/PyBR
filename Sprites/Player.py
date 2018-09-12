@@ -9,14 +9,14 @@ class Player(Game.AnimatedSprite):
         super().__init__()
         self._config = Registry.registered("config")
         self._speed = 5
-        self.load_image("assets/mage.png")
-        self.set_scale(3)
-        self._frameRect.width = 16 * self._scale
-        self._frameRect.height = 16 * self._scale
-        self.add_animation("run-down", Game.Animation(nb_frame=4))
-        self.add_animation("run-up", Game.Animation(nb_frame=4, start_index=4))
-        self.add_animation("run-right", Game.Animation(row=1, nb_frame=4))
-        self.add_animation("run-left", Game.Animation(row=1, nb_frame=4, start_index=4))
+        self.load_image("assets/players3.png")
+        #self.set_scale(3)
+        self._frameRect.width = 32 * self._scale
+        self._frameRect.height = 32 * self._scale
+        self.add_animation("run-down", Game.Animation(row=4, nb_frame=3))
+        self.add_animation("run-up", Game.Animation(row=7, nb_frame=3))
+        self.add_animation("run-right", Game.Animation(row=6, nb_frame=3))
+        self.add_animation("run-left", Game.Animation(row=5, nb_frame=3))
         self.set_animation("run-down")
         self._direction = None
         self._play_size = None
@@ -27,7 +27,7 @@ class Player(Game.AnimatedSprite):
         self.set_aim_color(list(map(int, self._config.get("aim", "color").split(","))))
         self._bullets = []
         self._active = active
-        self.bbox = pygame.Rect(10, 8, 25, 35)
+        self.bbox = pygame.Rect(10, 5, 12, 25)
 
     def set_aim_color(self, col):
         self._aims.set_color(col)
@@ -39,7 +39,7 @@ class Player(Game.AnimatedSprite):
             self.bbox.x = x + 10
         if y:
             self.rect.y = y
-            self.bbox.y = y + 8
+            self.bbox.y = y + 5
 
     def update(self, *args):
         if not self._active:
@@ -143,10 +143,10 @@ class Player(Game.AnimatedSprite):
                 del self._bullets[i]
             i += 1
 
-        #x, y, w, h = self.bbox
-        #pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(x - x_cam, y - y_cam, w, h), 1)
-
         super().draw(surface, camera)
+
+        x, y, w, h = self.bbox
+        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(x - x_cam, y - y_cam, w, h), 1)
 
     def set_play_size(self, size=(0, 0)):
         self._play_size = size
