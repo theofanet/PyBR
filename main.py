@@ -24,6 +24,7 @@ if __name__ == '__main__':
     App.load_scene("first", Scenes.FirstScene())
     App.load_scene("cave", Scenes.CaveScene())
     App.load_scene("astar", Scenes.AStarScene())
-    App.set_active_scene("cave")
+    App.load_scene("test", Scenes.TestScene())
+    App.set_active_scene("test")
 
     App.run()
