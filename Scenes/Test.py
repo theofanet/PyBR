@@ -69,7 +69,6 @@ class Locker:
     def __init__(self):
         self.l = LOCKERS_LENGHT
         self.w = LOCKERS_WIDTH
-        # self.modifier = self.l * 1.5
         self.selector = Selector()
         self.is_selected = False
         self.rect = None
@@ -82,7 +81,6 @@ class Selector:
     def __init__(self):
         self.l = LOCKERS_LENGHT * 1.5
         self.w = LOCKERS_WIDTH * 3
-        self.modifier = LOCKERS_LENGHT * 1.7
         self.rect = None
 
 
@@ -138,7 +136,7 @@ class TestScene(Game.Scene):
                 i += 1
 
     def draw(self):
-        self._font.draw_text("test", (380, 20), (255, 0, 0))
+        self._font.draw_text("jean boloss", (330, 20), (255, 0, 0))
         pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
 
         for x in self._grid.lockers_list:
