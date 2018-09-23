@@ -151,16 +151,17 @@ class Locker3(Game.Scene):
                     l.rect.y += 60
                     l.position = LOCKER_DOWN
 
-                # mirror locker.
-                if mirror.position > LOCKER_UP:
-                    mirror.rect.y -= 30
-                    mirror.position -= 1
+                # mirror locker + reverse pos.
+                if mirror.position < LOCKER_DOWN:
+                    mirror.rect.y += 30
+                    mirror.position += 1
                 elif mirror.blocked_type:
                     return
                 else:
-                    mirror.rect.y += 60
-                    mirror.position = LOCKER_DOWN
+                    mirror.rect.y -=60
+                    mirror.position = LOCKER_UP
 
+                # selector update.
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
                 else:
@@ -186,7 +187,6 @@ class Locker3(Game.Scene):
                         mirror.win_position = False
                         self._grid.locker_win_nb -= 1
 
-
             # DOWN !
             elif IO.Keyboard.is_down(K_DOWN):
                 # locker.
@@ -199,16 +199,17 @@ class Locker3(Game.Scene):
                     l.rect.y -=60
                     l.position = LOCKER_UP
 
-                # mirror locker.
-                if mirror.position < LOCKER_DOWN:
-                    mirror.rect.y += 30
-                    mirror.position += 1
+                # mirror locker + reverse pos.
+                if mirror.position > LOCKER_UP:
+                    mirror.rect.y -= 30
+                    mirror.position -= 1
                 elif mirror.blocked_type:
                     return
                 else:
-                    mirror.rect.y -=60
-                    mirror.position = LOCKER_UP
+                    mirror.rect.y += 60
+                    mirror.position = LOCKER_DOWN
 
+                # selector update.
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
                 else:
