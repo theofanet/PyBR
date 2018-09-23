@@ -12,7 +12,7 @@ LOCKER_DOWN = 2
 
 WAITING_STATE = 0
 WINNING_STATE = 1
-MAX_TIMER = 1000
+MAX_TIMER = 10
 
 SCREEN_W = 600
 SCREEN_L = 800
@@ -188,9 +188,8 @@ class Locker2(Game.SubScene):
                         self._grid.locker_win_nb -= 1
 
     def draw(self, camera=None, screen=None):
-        self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
-
         if self._state == WAITING_STATE and MAX_TIMER >= self._elapsed_time / 1000:
+            self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
             pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
 
             for index in range(len(self._grid.lockers_list)):
@@ -202,8 +201,9 @@ class Locker2(Game.SubScene):
                 if index == self._grid.selected_locker:
                     pygame.draw.rect(App.get_display(), (0, 0, 255), locker.selector.rect, 1)
         else:
-            self._font.draw_text("POUET", (10, 10), (255, 0, 0))
             if self._state == WINNING_STATE:
+                score = MAX_TIMER - (MAX_TIMER - (self._elapsed_time / 1000))
+                self._font.draw_text("%.2f" % score, (10, 10), (255, 0, 0))
                 self._font.draw_text("Bobby Clark le champion", (330, 20), (255, 0, 0))
                 pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
             else:
