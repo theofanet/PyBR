@@ -3,5 +3,7 @@ from .Network import NetworkScene
 from .Guiboude import Guiboude
 from .Cave import CaveScene
 from .AStar import AStarScene
-from .Test import TestScene
+from .Locker1 import Locker1
+from .Locker2 import Locker2
+from .Locker3 import Locker3
 import Scenes.Sub as Sub

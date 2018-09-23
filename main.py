@@ -26,8 +26,10 @@ if __name__ == '__main__':
     App.load_scene("first", Scenes.FirstScene())
     App.load_scene("cave", Scenes.CaveScene())
     App.load_scene("astar", Scenes.AStarScene())
-    App.load_scene("test", Scenes.TestScene())
     App.load_scene("locker-menu", LockersMenu())
+    App.load_scene("locker1", Scenes.Locker1())
+    App.load_scene("locker2", Scenes.Locker2())
+    App.load_scene("locker3", Scenes.Locker3())
     App.set_active_scene("locker-menu")
 
     App.run()
