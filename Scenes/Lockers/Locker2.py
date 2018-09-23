@@ -102,7 +102,7 @@ class Selector:
 
 
 # full scene.
-class Locker2(Game.Scene):
+class Locker2(Game.SubScene):
 
     def __init__(self):
         super().__init__()
@@ -113,13 +113,13 @@ class Locker2(Game.Scene):
         self._state = WAITING_STATE
         self._elapsed_time = 0
 
-    def _load_resources(self):
+    def _initiate_data(self, **kwargs):
         self._grid.rect = pygame.Rect(self._grid.x, self._grid.y, self._grid.l, self._grid.w)
         self._grid.init_lockers()
 
     def update(self):
         if IO.Keyboard.is_down(K_ESCAPE):
-            App.exit()
+            self._scene.return_menu()
 
         if self._state == WAITING_STATE and MAX_TIMER > self._elapsed_time / 1000:
             self._elapsed_time += App.get_time()
@@ -187,7 +187,7 @@ class Locker2(Game.Scene):
                         l.win_position = False
                         self._grid.locker_win_nb -= 1
 
-    def draw(self):
+    def draw(self, camera=None, screen=None):
         self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
 
         if self._state == WAITING_STATE and MAX_TIMER >= self._elapsed_time / 1000:

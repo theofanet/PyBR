@@ -12,7 +12,7 @@ LOCKER_DOWN = 2
 
 WAITING_STATE = 0
 WINNING_STATE = 1
-MAX_TIMER = 1
+MAX_TIMER = 1000
 
 SCREEN_W = 600
 SCREEN_L = 800
@@ -37,6 +37,8 @@ class Grid:
         self.lockers_win = [randint(0, 2) for _ in range(LOCKERS_NB)]
         self.locker_win_nb = 0
         self.selected_locker = 0
+
+        self.is_fixed = False
 
     # init a list of lockers, depend of LOCKERS_NB.
     def init_lockers(self):
@@ -69,10 +71,6 @@ class Grid:
             selector_pos_x = self.start_pos - selector_modifier
             locker.selector.rect = pygame.Rect(selector_pos_x, selector_pos_y, locker.selector.l, locker.selector.w)
 
-            # set blocked type odd.
-            # if index % 2:
-            #     locker.blocked_type = True
-
             locker_modifier += LOCKERS_LENGHT * 2
             selector_modifier += LOCKERS_LENGHT * 2
 
@@ -102,7 +100,7 @@ class Selector:
 
 
 # full scene.
-class Locker3(Game.Scene):
+class Locker1(Game.SubScene):
 
     def __init__(self):
         super().__init__()
@@ -113,61 +111,44 @@ class Locker3(Game.Scene):
         self._state = WAITING_STATE
         self._elapsed_time = 0
 
-    def _load_resources(self):
+    def _initiate_data(self):
         self._grid.rect = pygame.Rect(self._grid.x, self._grid.y, self._grid.l, self._grid.w)
         self._grid.init_lockers()
 
     def update(self):
         if IO.Keyboard.is_down(K_ESCAPE):
-            App.exit()
+            self._scene.return_menu()
 
         if self._state == WAITING_STATE and MAX_TIMER > self._elapsed_time / 1000:
             self._elapsed_time += App.get_time()
 
             i = self._grid.selected_locker
             l = self._grid.lockers_list[i]
-            # mirror.
-            mirror = self._grid.lockers_list[len(self._grid.lockers_list) - 1 - i]
 
             if self._grid.locker_win_nb == LOCKERS_NB:
                 self._state = WINNING_STATE
 
-            # if l.win_position:
-            #     if i < len(self._grid.lockers_list) - 1:
-            #         self._grid.selected_locker += 1
-            #     else:
-            #         self._grid.selected_locker = 0
-            #     return
+            if self._grid.is_fixed and l.win_position:
+                if i < len(self._grid.lockers_list) - 1:
+                    self._grid.selected_locker += 1
+                else:
+                    self._grid.selected_locker = 0
+                return
 
             # UP !
             if IO.Keyboard.is_down(K_UP):
-                # locker.
                 if l.position > LOCKER_UP:
                     l.rect.y -= 30
                     l.position -= 1
-                elif l.blocked_type:
-                    return
                 else:
                     l.rect.y += 60
                     l.position = LOCKER_DOWN
 
-                # mirror locker + reverse pos.
-                if mirror.position < LOCKER_DOWN:
-                    mirror.rect.y += 30
-                    mirror.position += 1
-                elif mirror.blocked_type:
-                    return
-                else:
-                    mirror.rect.y -=60
-                    mirror.position = LOCKER_UP
-
-                # selector update.
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
                 else:
                     self._grid.selected_locker = 0
 
-                # locker win resolution.
                 if l.position == self._grid.lockers_win[i]:
                     l.win_position = True
                     l.discover = True
@@ -175,47 +156,22 @@ class Locker3(Game.Scene):
                 else:
                     if l.win_position:
                         l.win_position = False
-                        self._grid.locker_win_nb -= 1
-
-                # mirror win resolution.
-                if mirror.position == self._grid.lockers_win[len(self._grid.lockers_list) - 1 - i]:
-                    mirror.win_position = True
-                    mirror.discover = True
-                    self._grid.locker_win_nb += 1
-                else:
-                    if mirror.win_position:
-                        mirror.win_position = False
                         self._grid.locker_win_nb -= 1
 
             # DOWN !
             elif IO.Keyboard.is_down(K_DOWN):
-                # locker.
                 if l.position < LOCKER_DOWN:
                     l.rect.y += 30
                     l.position += 1
-                elif l.blocked_type:
-                    return
                 else:
                     l.rect.y -=60
                     l.position = LOCKER_UP
 
-                # mirror locker + reverse pos.
-                if mirror.position > LOCKER_UP:
-                    mirror.rect.y -= 30
-                    mirror.position -= 1
-                elif mirror.blocked_type:
-                    return
-                else:
-                    mirror.rect.y += 60
-                    mirror.position = LOCKER_DOWN
-
-                # selector update.
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
                 else:
                     self._grid.selected_locker = 0
 
-                # locker win resolution.
                 if l.position == self._grid.lockers_win[i]:
                     l.win_position = True
                     l.discover = True
@@ -225,20 +181,10 @@ class Locker3(Game.Scene):
                         l.win_position = False
                         self._grid.locker_win_nb -= 1
 
-                # mirror win resolution.
-                if mirror.position == self._grid.lockers_win[len(self._grid.lockers_list) - 1 - i]:
-                    mirror.win_position = True
-                    mirror.discover = True
-                    self._grid.locker_win_nb += 1
-                else:
-                    if mirror.win_position:
-                        mirror.win_position = False
-                        self._grid.locker_win_nb -= 1
-
-    def draw(self):
+    def draw(self, camera=None, screen=None):
+        self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
 
         if self._state == WAITING_STATE and MAX_TIMER >= self._elapsed_time / 1000:
-            self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
             pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
 
             for index in range(len(self._grid.lockers_list)):

@@ -1,6 +1,10 @@
 from PyGnin import *
 import pygame
 
+from .Locker1 import Locker1
+from .Locker2 import Locker2
+from .Locker3 import Locker3
+
 
 NB_LEVELS = 4
 RED_COLOR = (192, 57, 43)
@@ -10,9 +14,9 @@ CURSOR_ANIMATION_SPEED = 30
 
 
 class LockerLevel(object):
-    def __init__(self):
+    def __init__(self, scene):
         self.is_done = False
-        self._scene = None
+        self._scene = scene
 
     def update(self):
         if self._scene:
@@ -21,6 +25,10 @@ class LockerLevel(object):
     def draw(self):
         if self._scene:
             self._scene.draw()
+
+    def init_scene(self, master_scene):
+        if self._scene:
+            self._scene.initiate(master_scene)
 
 
 class MenuCursor(object):
@@ -66,6 +74,9 @@ class LockersMenu(Game.Scene):
         self._fonts = None
         self._cursor = None
 
+    def return_menu(self):
+        self._active_level = None
+
     def _load_resources(self):
         App.show_cursor(True)
 
@@ -74,7 +85,12 @@ class LockersMenu(Game.Scene):
             Render.Font("assets/fonts/IMPOS-30.ttf", 70)
         ]
 
-        self._levels = [LockerLevel() for _ in range(NB_LEVELS)]
+        self._levels = [
+            LockerLevel(Locker1()),
+            LockerLevel(Locker2()),
+            LockerLevel(Locker3()),
+            LockerLevel(Locker3())
+        ]
         self._levels[0].is_done = True
 
         self._cursor = MenuCursor()
@@ -82,11 +98,8 @@ class LockersMenu(Game.Scene):
     def update(self):
         self._elapsed_time += App.get_time()
 
-        if IO.Keyboard.is_down(K_ESCAPE):
-            App.exit()
-
         if self._active_level is not None:
-            self._levels[self._active_level].draw()
+            self._levels[self._active_level].update()
         else:
             self._cursor.update()
             cursor_index = self._cursor.get_index()
@@ -96,6 +109,15 @@ class LockersMenu(Game.Scene):
             elif IO.Keyboard.is_up(K_RIGHT):
                 if cursor_index < NB_LEVELS - 1 and self._levels[cursor_index].is_done:
                     self._cursor.set_index(cursor_index + 1)
+            elif IO.Keyboard.is_down(K_RETURN):
+                self.activate_level(cursor_index, self)
+
+        if IO.Keyboard.is_down(K_ESCAPE):
+            App.exit()
+
+    def activate_level(self, index, master_scene):
+        self._active_level = index
+        self._levels[self._active_level].init_scene(master_scene)
 
     def draw(self):
         if self._active_level is None:
