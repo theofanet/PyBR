@@ -191,7 +191,6 @@ class Locker2(Game.Scene):
         self._font.draw_text("%.2f" % (MAX_TIMER - (self._elapsed_time / 1000)), (10, 10), (255, 0, 0))
 
         if self._state == WAITING_STATE and MAX_TIMER >= self._elapsed_time / 1000:
-            self._font.draw_text("jean boloss", (330, 20), (255, 0, 0))
             pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
 
             for index in range(len(self._grid.lockers_list)):
@@ -203,8 +202,8 @@ class Locker2(Game.Scene):
                 if index == self._grid.selected_locker:
                     pygame.draw.rect(App.get_display(), (0, 0, 255), locker.selector.rect, 1)
         elif self._state == WINNING_STATE:
-            self._font.draw_text("GG PD", (330, 20), (255, 0, 0))
+            self._font.draw_text("Bobby Clark le champion", (330, 20), (255, 0, 0))
             pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
         else:
-            self._font.draw_text("PAS GG PD", (330, 20), (255, 0, 0))
+            self._font.draw_text("Bobby Clark le looser", (330, 20), (255, 0, 0))
             pygame.draw.rect(App.get_display(), (255, 0, 0), self._grid, 1)
