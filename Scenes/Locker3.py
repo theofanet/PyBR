@@ -2,7 +2,7 @@ from PyGnin import *
 from random import randint
 import pygame
 
-LOCKERS_NB = 30
+LOCKERS_NB = 10
 LOCKERS_LENGHT = 10
 LOCKERS_WIDTH = 40
 
@@ -127,7 +127,6 @@ class Locker3(Game.Scene):
             i = self._grid.selected_locker
             l = self._grid.lockers_list[i]
             # mirror.
-            print(len(self._grid.lockers_list) - i)
             mirror = self._grid.lockers_list[len(self._grid.lockers_list) - 1 - i]
 
             if self._grid.locker_win_nb == LOCKERS_NB:
@@ -167,6 +166,7 @@ class Locker3(Game.Scene):
                 else:
                     self._grid.selected_locker = 0
 
+                # locker win resolution.
                 if l.position == self._grid.lockers_win[i]:
                     l.win_position = True
                     l.discover = True
@@ -175,6 +175,17 @@ class Locker3(Game.Scene):
                     if l.win_position:
                         l.win_position = False
                         self._grid.locker_win_nb -= 1
+
+                # mirror win resolution.
+                if mirror.position == self._grid.lockers_win[len(self._grid.lockers_list) - 1 - i]:
+                    mirror.win_position = True
+                    mirror.discover = True
+                    self._grid.locker_win_nb += 1
+                else:
+                    if mirror.win_position:
+                        mirror.win_position = False
+                        self._grid.locker_win_nb -= 1
+
 
             # DOWN !
             elif IO.Keyboard.is_down(K_DOWN):
@@ -203,6 +214,7 @@ class Locker3(Game.Scene):
                 else:
                     self._grid.selected_locker = 0
 
+                # locker win resolution.
                 if l.position == self._grid.lockers_win[i]:
                     l.win_position = True
                     l.discover = True
@@ -210,6 +222,16 @@ class Locker3(Game.Scene):
                 else:
                     if l.win_position:
                         l.win_position = False
+                        self._grid.locker_win_nb -= 1
+
+                # mirror win resolution.
+                if mirror.position == self._grid.lockers_win[len(self._grid.lockers_list) - 1 - i]:
+                    mirror.win_position = True
+                    mirror.discover = True
+                    self._grid.locker_win_nb += 1
+                else:
+                    if mirror.win_position:
+                        mirror.win_position = False
                         self._grid.locker_win_nb -= 1
 
     def draw(self):
