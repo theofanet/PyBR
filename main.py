@@ -2,6 +2,8 @@ from PyGnin import *
 import Scenes
 from configparser import ConfigParser
 
+from Scenes.Lockers.Menu import LockersMenu
+
 
 config = ConfigParser()
 config.read("./config.ini")
@@ -25,6 +27,7 @@ if __name__ == '__main__':
     App.load_scene("cave", Scenes.CaveScene())
     App.load_scene("astar", Scenes.AStarScene())
     App.load_scene("test", Scenes.TestScene())
-    App.set_active_scene("test")
+    App.load_scene("locker-menu", LockersMenu())
+    App.set_active_scene("locker-menu")
 
     App.run()
