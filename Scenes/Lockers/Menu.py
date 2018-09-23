@@ -77,6 +77,12 @@ class LockersMenu(Game.Scene):
     def return_menu(self):
         self._active_level = None
 
+    def level_complete(self):
+        self._levels[self._active_level].is_done = True
+        index = self._cursor.get_index()
+        if index < NB_LEVELS - 1:
+            self._cursor.set_index(index + 1)
+
     def _load_resources(self):
         App.show_cursor(True)
 
@@ -91,7 +97,6 @@ class LockersMenu(Game.Scene):
             LockerLevel(Locker3()),
             LockerLevel(Locker3())
         ]
-        self._levels[0].is_done = True
 
         self._cursor = MenuCursor()
 

@@ -127,6 +127,7 @@ class Locker1(Game.SubScene):
 
             if self._grid.locker_win_nb == LOCKERS_NB:
                 self._state = WINNING_STATE
+                self._scene.level_complete()
 
             if self._grid.is_fixed and l.win_position:
                 if i < len(self._grid.lockers_list) - 1:

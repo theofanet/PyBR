@@ -9,7 +9,8 @@ class Keyboard(object):
     @staticmethod
     def update(event):
         if event.type == KEYDOWN:
-            Keyboard._keysDown[event.key] = True
+            if not Keyboard.is_held(event.key):
+                Keyboard._keysDown[event.key] = True
             Keyboard._keysHeld[event.key] = True
             if event.key in Keyboard._keysUp:
                 del Keyboard._keysUp[event.key]
