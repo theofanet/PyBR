@@ -68,7 +68,7 @@ class LockersMenu(Game.Scene):
     def __init__(self):
         super().__init__()
         self._active_level = None
-        self._current_level = 1
+        self._current_level = 2
         self._levels = []
         self._elapsed_time = 0
         self._fonts = None
@@ -92,6 +92,7 @@ class LockersMenu(Game.Scene):
             LockerLevel(Locker3())
         ]
         self._levels[0].is_done = True
+        self._levels[1].is_done = True
 
         self._cursor = MenuCursor()
 
