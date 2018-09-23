@@ -70,8 +70,8 @@ class Grid:
             locker.selector.rect = pygame.Rect(selector_pos_x, selector_pos_y, locker.selector.l, locker.selector.w)
 
             # set blocked type odd.
-            if index % 2:
-                locker.blocked_type = True
+            # if index % 2:
+            #     locker.blocked_type = True
 
             locker_modifier += LOCKERS_LENGHT * 2
             selector_modifier += LOCKERS_LENGHT * 2
@@ -102,7 +102,7 @@ class Selector:
 
 
 # full scene.
-class Locker2(Game.Scene):
+class Locker3(Game.Scene):
 
     def __init__(self):
         super().__init__()
@@ -126,6 +126,9 @@ class Locker2(Game.Scene):
 
             i = self._grid.selected_locker
             l = self._grid.lockers_list[i]
+            # mirror.
+            print(len(self._grid.lockers_list) - i)
+            mirror = self._grid.lockers_list[len(self._grid.lockers_list) - 1 - i]
 
             if self._grid.locker_win_nb == LOCKERS_NB:
                 self._state = WINNING_STATE
@@ -139,6 +142,7 @@ class Locker2(Game.Scene):
 
             # UP !
             if IO.Keyboard.is_down(K_UP):
+                # locker.
                 if l.position > LOCKER_UP:
                     l.rect.y -= 30
                     l.position -= 1
@@ -147,6 +151,16 @@ class Locker2(Game.Scene):
                 else:
                     l.rect.y += 60
                     l.position = LOCKER_DOWN
+
+                # mirror locker.
+                if mirror.position > LOCKER_UP:
+                    mirror.rect.y -= 30
+                    mirror.position -= 1
+                elif mirror.blocked_type:
+                    return
+                else:
+                    mirror.rect.y += 60
+                    mirror.position = LOCKER_DOWN
 
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
@@ -164,6 +178,7 @@ class Locker2(Game.Scene):
 
             # DOWN !
             elif IO.Keyboard.is_down(K_DOWN):
+                # locker.
                 if l.position < LOCKER_DOWN:
                     l.rect.y += 30
                     l.position += 1
@@ -172,6 +187,16 @@ class Locker2(Game.Scene):
                 else:
                     l.rect.y -=60
                     l.position = LOCKER_UP
+
+                # mirror locker.
+                if mirror.position < LOCKER_DOWN:
+                    mirror.rect.y += 30
+                    mirror.position += 1
+                elif mirror.blocked_type:
+                    return
+                else:
+                    mirror.rect.y -=60
+                    mirror.position = LOCKER_UP
 
                 if i < len(self._grid.lockers_list) - 1:
                     self._grid.selected_locker += 1
